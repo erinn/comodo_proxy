@@ -1,0 +1,1 @@
+from comodo_proxy import app as application

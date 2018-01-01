@@ -1,0 +1,16 @@
+version: '3'
+services:
+  web:
+    image: "comodo_proxy"
+    ports:
+    - "8080:8080"
+    volumes:
+      - /etc/comodo_proxy/comodo_proxy.ini:/etc/comodo_proxy/comodo_proxy.ini:ro
+      - /etc/krb5.keytab:/etc/krb5.keytab:ro
+      - /etc/krb5.conf:/etc/krb5.conf:ro
+      - /etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro
+      - /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro
+      - /etc/comodo_proxy/acl:/etc/comodo_proxy/acl:ro
+    # environment:
+      # To get better error messages out of kerberos/gssapi enable KRB5_TRACE
+      # KRB5_TRACE: /dev/stdout
