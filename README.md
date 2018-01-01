@@ -1,20 +1,27 @@
 comodo_proxy is a simle(ish) proxy between Comodo's SOAP API and a custom and minimal REST API. comodo_proxy
 is designed to be deployed in a Kerberos/GSSAPI environment as access control is handled that way. 
 
+# Deploying:
 This code is meant to be run inside of a docker container, and for maximum ease I would recommend using the 
 source-to-image tool: https://github.com/openshift/source-to-image
 
 Using s2i will dramatically speed up deployment of the application, if a container needs to be built by hand 
 for some reason, that exercise will be left up to the reader.
 
-From within the repository run the following for the CentOS image:
-s2i build . docker.io/centos/python-36-centos7 comodo_proxy
+To build the image run the following for CentOS:
+
+    s2i build https://github.com/erinn/comodo_proxy docker.io/centos/python-36-centos7 comodo_proxy
 
 Or if you have paid for a RHEL system:
-s2i build . registry.access.redhat.com/rhscl/python-36-rhel7 comodo_proxy
 
-This will provide you with a docker container tagged 'comodo_proxy' which you will then need to start. The container 
-requires the following mounts in order to work (all files must, obviously, be readable by the container):
+    s2i build https://github.com/erinn/comodo_proxy registry.access.redhat.com/rhscl/python-36-rhel7 comodo_proxy
+
+This will provide you with a docker container tagged 'comodo_proxy' which you will then need to start with the
+appropriate mount points, see below.
+
+## Mounts:
+The container requires the following mounts in order to work (all files on the host must, obviously, 
+be readable by the container):
 - /etc/comodo_proxy/comodo_proxy.ini:/etc/comodo_proxy/comodo_proxy.ini:ro
 The main configuration file whose options are detailed below.
 - /etc/krb5.keytab:/etc/krb5.keytab:ro
@@ -31,9 +38,10 @@ The ACL file, simply one principle per line, documented below.
 
 All mounts are read only, as nothing should change on the host.
 
+## Development:
 For ease of use during development, the docker-compose.yml file has been provided with all mounts listed.
 
-## comodo_proxy.ini
+## comodo_proxy.ini:
 The comodo_proxy.ini file contains most of the configuration directives for the application and is documented below:
 
     [default]
@@ -66,7 +74,7 @@ The comodo_proxy.ini file contains most of the configuration directives for the 
     # You can select the GSSAPI service name to use here, if omitted HTTP will be used.
     gssapi_servicename=HTTP
 
-# The comodo_proxy ACL file
+# The comodo_proxy ACL file:
 The 'acl' file, located in /etc/comodo_proxy/acl in the container is simply formatted as one principle per line, for
 example:
 
