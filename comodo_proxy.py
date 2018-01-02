@@ -16,10 +16,11 @@ syslog_handler.setLevel(logging.WARNING)
 app = Flask(__name__)
 app.logger.addHandler(syslog_handler)
 
-app.config['DEBUG'] = True
+# If debugging is needed
+# app.config['DEBUG'] = True
 
 # Configure the application
-# SENTRY_DSN must be defined as an environment variable, see here:
+# SENTRY_DSN must be defined as an environment variable, if not sentry will simply not function, see here:
 # https://docs.sentry.io/clients/python/integrations/flask/
 sentry = Sentry(app)
 
@@ -30,10 +31,10 @@ config.read('/etc/comodo_proxy/comodo_proxy.ini')
 
 kwargs = dict(config['default'])
 
-# A little funny, but I want the value to come through as a bool not str.
+# The value should come through as a bool not str.
 kwargs['client_cert_auth'] = config['default'].getboolean('client_cert_auth')
 
-# Set the host principle service name to host by default
+# Set the host principle service name to HTTP by default
 app.config['GSSAPI_SERVICE_NAME'] = kwargs.get('gssapi_service_name', 'HTTP')
 app.logger.debug('GSSAPI_SERVICE_NAME: %s' % app.config['GSSAPI_SERVICE_NAME'])
 
@@ -65,7 +66,8 @@ app.logger.debug('ACL List consumed: %s' % acl_list)
 # The following models define the input and output, this mainly aids in documentation for
 # OpenAPI/Swagger
 
-# All responses should inherit the status_response_model
+# All responses should inherit the status_response_model, this is basically jsend format, see here:
+# https://labs.omniti.com/labs/jsend
 status_response_model = api.model('Status Response',
                                   {'status': fields.String(description='The Status Message', example='success')})
 
@@ -258,12 +260,12 @@ if __name__ == '__main__':
                         help="port of server (default:%(default)s)", type=int, default=5000)
 
     cmd_args = parser.parse_args()
-    app_options = {"port": cmd_args.port}
+    app_options['port'] = cmd_args.port
     app_options['host'] = '0.0.0.0'
 
     if cmd_args.debug_mode:
-        app_options["debug"] = True
-        app_options["use_debugger"] = False
-        app_options["use_reloader"] = True
+        app_options['debug'] = True
+        app_options['use_debugger'] = False
+        app_options['use_reloader'] = True
 
     app.run(**app_options)

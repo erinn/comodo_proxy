@@ -1,5 +1,6 @@
 comodo_proxy is a simle(ish) proxy between Comodo's SOAP API and a custom and minimal REST API. comodo_proxy
-is designed to be deployed in a Kerberos/GSSAPI environment as access control is handled that way. 
+is designed to be deployed in a Kerberos/GSSAPI environment as access control is handled via principles, the code
+could be modified for simple auth easily. 
 
 # Deploying:
 This code is meant to be run inside of a docker container, and for maximum ease I would recommend using the 
@@ -39,7 +40,9 @@ The ACL file, simply one principle per line, documented below.
 All mounts are read only, as nothing should change on the host.
 
 ## Development:
-For ease of use during development, the docker-compose.yml file has been provided with all mounts listed.
+For ease of use during development, the docker-compose.yml file has been provided with all mounts listed. The image
+that is brought up can be placed behind any proxy (nginx, apache, see below). However it is set to trust all headers
+by default, this is dangerous and should only be used for development or in a highly controlled environment.
 
 ## comodo_proxy.ini:
 The comodo_proxy.ini file contains most of the configuration directives for the application and is documented below:
@@ -82,3 +85,67 @@ example:
     api-user2@EXAMPLE.COM
 
 The first part before the '@' is the user/host/service definition, the second is the Kerberos realm.
+
+# Proxying for the Container:
+You will probably not want the container exposing gunicorn, instead a proxy is recommended using either apache or nginx.
+A few headers need to be set in order for the application to respond with the correct URLs. The following examples are
+using SSL/TLS by default (as that is simply best and should be the default).
+
+For nginx:
+
+    # Settings for a TLS enabled server.
+    #
+        server {
+            listen       443 ssl http2 default_server;
+            listen       [::]:443 ssl http2 default_server;
+            server_name  _;
+            root         /usr/share/nginx/html;
+    
+            ssl_certificate "/etc/pki/tls/certs/www.example.com.crt";
+            ssl_certificate_key "/etc/pki/tls/private/www.example.com.key";
+            ssl_session_cache shared:SSL:1m;
+            ssl_session_timeout  10m;
+            ssl_ciphers PROFILE=SYSTEM;
+            ssl_prefer_server_ciphers on;
+    
+            # Load configuration files for the default server block.
+            include /etc/nginx/default.d/*.conf;
+    
+            location / {
+                    proxy_pass         http://localhost:8080/;
+                    proxy_redirect     off;
+    
+                    # Set the host header so gunicorn/flask can consume it and set URLs correctly
+                    proxy_set_header   Host                 $host;
+                    proxy_set_header   X-Real-IP            $remote_addr;
+                    proxy_set_header   X-Forwarded-For      $proxy_add_x_forwarded_for;
+                    # Whether to produce http or https URLs
+                    proxy_set_header   X-Forwarded-Proto    $scheme;
+            }
+            
+For apache:
+
+    <VirtualHost www.example.com:443>
+            SSLEngine On
+            ServerName www.example.com
+            DocumentRoot /var/www/html/
+            ServerAdmin help@example.com
+    
+            SSLEngine On
+            SSLCertificateFile /etc/pki/tls/certs/www.example.com.crt
+            SSLCertificateKeyFile /etc/pki/tls/private/www.example.com.key
+    
+            <Directory /var/www/html/>
+                Require all granted
+            </Directory>
+    
+            RequestHeader set X-Forwarded-Proto "https"
+            ProxyPreserveHost On
+            # For Apache info
+            ProxyPass /server-info !
+            ProxyPass /server-status !
+            # For ACME challenges (LetsEncrypt)
+            ProxyPass /.well-known !
+            ProxyPass "/" "http://localhost:8080/"
+            ProxyPassReverse "/" "http://localhost:8080/"
+    </VirtualHost>

@@ -11,6 +11,11 @@ services:
       - /etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro
       - /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro
       - /etc/comodo_proxy/acl:/etc/comodo_proxy/acl:ro
-    # environment:
+    environment:
       # To get better error messages out of kerberos/gssapi enable KRB5_TRACE
       # KRB5_TRACE: /dev/stdout
+     # When used behind a proxy, gunicorn will not trust the headers sent by the proxy
+     # unless the following is set, this is dangerous if there is any chance the container
+     # will be able to accept connections from anywhere but the proxy, it can be set to
+     # specific IPs for more safety, see here: http://docs.gunicorn.org/en/latest/settings.html#forwarded-allow-ips
+     FORWARDED_ALLOW_IPS: '*'
