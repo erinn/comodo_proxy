@@ -35,10 +35,12 @@ kwargs['client_cert_auth'] = config['default'].getboolean('client_cert_auth')
 
 # Set the host principle service name to host by default
 app.config['GSSAPI_SERVICE_NAME'] = kwargs.get('gssapi_service_name', 'HTTP')
+app.logger.debug('GSSAPI_SERVICE_NAME: %s' % app.config['GSSAPI_SERVICE_NAME'])
 
 # Allow the host name for the principle to be overridden, defaults to FQDN.
 if 'gssapi_hostname' in kwargs:
     app.config['GSSAPI_HOSTNAME'] = kwargs['gssapi_hostname']
+app.logger.debug('GSSAPI_HOSTNAME: %s' % app.config['GSSAPI_HOSTNAME'])
 
 # We validate all input data
 app.config['RESTPLUS_VALIDATE'] = True
