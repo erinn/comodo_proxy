@@ -6,18 +6,15 @@ import jsend
 from flask import Flask, jsonify, request
 from flask_gssapi import GSSAPI
 from flask_restplus import Resource, Api, fields
-from logging.handlers import SysLogHandler
+from logging import StreamHandler
 from raven.contrib.flask import Sentry
 
-# Enable logging
-syslog_handler = SysLogHandler()
-syslog_handler.setLevel(logging.WARNING)
+# Enable logging to stderr
+stream_handler = StreamHandler()
+stream_handler.setLevel(logging.WARNING)
 
 app = Flask(__name__)
-app.logger.addHandler(syslog_handler)
-
-# If debugging is needed
-# app.config['DEBUG'] = True
+app.logger.addHandler(stream_handler)
 
 # Configure the application
 # SENTRY_DSN must be defined as an environment variable, if not sentry will simply not function, see here:
@@ -30,6 +27,10 @@ config = configparser.ConfigParser(interpolation=None)
 config.read('/etc/comodo_proxy/comodo_proxy.ini')
 
 kwargs = dict(config['default'])
+
+# Enable debugging output
+if config['default'].getboolean('debug'):
+    stream_handler.setLevel(logging.DEBUG)
 
 # The value should come through as a bool not str.
 kwargs['client_cert_auth'] = config['default'].getboolean('client_cert_auth')
