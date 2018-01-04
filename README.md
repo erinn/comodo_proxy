@@ -56,8 +56,10 @@ The comodo_proxy.ini file contains most of the configuration directives for the 
     cert_type_name=PlatinumSSL Certificate
     # The Comodo customer's login URI
     customer_login_uri=example
+    # Enable debugging by setting to true
+    debug=false
     # The Comodo user to log in as
-    login=sis-unix-api
+    login=
     # The Comodo organization ID to use
     org_id=
     # The Comodo password for the user
