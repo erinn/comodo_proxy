@@ -11,29 +11,31 @@ for some reason, that exercise will be left up to the reader.
 
 To build the image run the following for CentOS:
 
-    s2i build https://github.com/erinn/comodo_proxy docker.io/centos/python-36-centos7 comodo_proxy
+    s2i build https://github.com/erinn/comodo_proxy docker.io/centos/python-36-centos7 comodo_proxy:latest
 
 Or if you have paid for a RHEL system:
 
-    s2i build https://github.com/erinn/comodo_proxy registry.access.redhat.com/rhscl/python-36-rhel7 comodo_proxy
+    s2i build https://github.com/erinn/comodo_proxy registry.access.redhat.com/rhscl/python-36-rhel7 comodo_proxy:latest
 
 This will provide you with a docker container tagged 'comodo_proxy' which you will then need to start with the
 appropriate mount points, see below.
 
 ## Mounts:
 The container requires the following mounts in order to work (all files on the host must, obviously, 
-be readable by the container):
+be readable by the container, the container runs as user 1001:0 set permissions accordingly):
 - /etc/comodo_proxy/comodo_proxy.ini:/etc/comodo_proxy/comodo_proxy.ini:ro
 The main configuration file whose options are detailed below.
 - /etc/krb5.keytab:/etc/krb5.keytab:ro
 The keytab to be used, another source location can be used if needed( for instance /etc/keytabs/krb5-HTTP.keytab) but 
-/etc/krb5.keytab should be where it is mapped to in the container for ease.
+/etc/krb5.keytab should be where it is mapped to in the container for ease. The keytab should not be world readable
+so chgrp it to 0 mode 640.
 - /etc/krb5.conf:/etc/krb5.conf:ro
 The krb5.conf file to let kerberos kno how to operate
 - /etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro
 If two factor authentication is being used against Comodo's API, the location of the public client certificate.
 - /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro
-If two factor authentication is being used against Comodo's API, the location of the private client key.
+If two factor authentication is being used against Comodo's API, the location of the private client key. Again a file
+that should only be readable by the container user, chgrp to 0 and mode 640.
 - /etc/comodo_proxy/acl:/etc/comodo_proxy/acl:ro
 The ACL file, simply one principle per line, documented below.
 
@@ -75,7 +77,7 @@ The comodo_proxy.ini file contains most of the configuration directives for the 
     # be overriden, set this to the kerberos principle's name.
     gssapi_hostname=api.example.com
     # You can select the GSSAPI service name to use here, if omitted HTTP will be used.
-    gssapi_servicename=HTTP
+    gssapi_servicename=host
 
 # The comodo_proxy ACL file:
 The 'acl' file, located in /etc/comodo_proxy/acl in the container is simply formatted as one principle per line, for
