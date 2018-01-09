@@ -46,6 +46,8 @@ If you are unfortunate enough to be working in an SELinux environment you MIGHT 
 some files, in the above mounts /etc/krb5.keytab would need the context changed to svirt_sandbox_file_t so the container
 can read it. Most, but not all files in /etc/ on the host are readable by docker.
 
+There is a bug open about this here: https://bugzilla.redhat.com/show_bug.cgi?id=1532386
+
 ## Development:
 For ease of use during development, the docker-compose.yml file has been provided with all mounts listed. The image
 that is brought up can be placed behind any proxy (nginx, apache, see below). However it is set to trust all headers
