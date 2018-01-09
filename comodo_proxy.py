@@ -2,19 +2,19 @@ import comodo_api
 import configparser
 import logging
 import jsend
+import sys
 
 from flask import Flask, jsonify, request
 from flask_gssapi import GSSAPI
 from flask_restplus import Resource, Api, fields
-from logging import StreamHandler
 from raven.contrib.flask import Sentry
 
-# Enable logging to stderr
-stream_handler = StreamHandler()
-stream_handler.setLevel(logging.WARNING)
-
 app = Flask(__name__)
-app.logger.addHandler(stream_handler)
+if not app.debug:
+    app.logger.addHandler(logging.StreamHandler(stream=sys.stdout))
+    app.logger.setLevel(logging.INFO)
+
+app.logger.info('comodo_proxy is starting.')
 
 # Configure the application
 # SENTRY_DSN must be defined as an environment variable, if not sentry will simply not function, see here:
@@ -27,10 +27,6 @@ config = configparser.ConfigParser(interpolation=None)
 config.read('/etc/comodo_proxy/comodo_proxy.ini')
 
 kwargs = dict(config['default'])
-
-# Enable debugging output
-if config['default'].getboolean('debug'):
-    stream_handler.setLevel(logging.DEBUG)
 
 # The value should come through as a bool not str.
 kwargs['client_cert_auth'] = config['default'].getboolean('client_cert_auth')
@@ -261,7 +257,7 @@ if __name__ == '__main__':
                         help="port of server (default:%(default)s)", type=int, default=5000)
 
     cmd_args = parser.parse_args()
-    app_options['port'] = cmd_args.port
+    app_options = {'port': cmd_args.port}
     app_options['host'] = '0.0.0.0'
 
     if cmd_args.debug_mode:

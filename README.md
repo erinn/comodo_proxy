@@ -28,7 +28,7 @@ The main configuration file whose options are detailed below.
 - /etc/krb5.keytab:/etc/krb5.keytab:ro
 The keytab to be used, another source location can be used if needed( for instance /etc/keytabs/krb5-HTTP.keytab) but 
 /etc/krb5.keytab should be where it is mapped to in the container for ease. The keytab should not be world readable
-so chgrp it to 0 mode 640.
+so chgrp it to 0 mode 640 and note the SELinux section below.
 - /etc/krb5.conf:/etc/krb5.conf:ro
 The krb5.conf file to let kerberos kno how to operate
 - /etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro
@@ -40,6 +40,11 @@ that should only be readable by the container user, chgrp to 0 and mode 640.
 The ACL file, simply one principle per line, documented below.
 
 All mounts are read only, as nothing should change on the host.
+
+### Mounts and SELinux
+If you are unfortunate enough to be working in an SELinux environment you MIGHT have to change the context of 
+some files, in the above mounts /etc/krb5.keytab would need the context changed to svirt_sandbox_file_t so the container
+can read it. Most, but not all files in /etc/ on the host are readable by docker.
 
 ## Development:
 For ease of use during development, the docker-compose.yml file has been provided with all mounts listed. The image
