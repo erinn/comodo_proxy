@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    image: "comodo_proxy:latest"
+    image: "comodo_proxy:devel"
     ports:
     - "8080:8080"
     volumes:
@@ -12,8 +12,10 @@ services:
       - /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro
       - /etc/comodo_proxy/acl:/etc/comodo_proxy/acl:ro
     environment:
-      # To get better error messages out of kerberos/gssapi enable KRB5_TRACE
-      # KRB5_TRACE: /dev/stdout
+     #Set gunicorn logging to debug
+     GUNICORN_CMD_ARGS: "--log-level=debug"
+     # To get better error messages out of kerberos/gssapi enable KRB5_TRACE
+     KRB5_TRACE: /dev/stdout
      # When used behind a proxy, gunicorn will not trust the headers sent by the proxy
      # unless the following is set, this is dangerous if there is any chance the container
      # will be able to accept connections from anywhere but the proxy, it can be set to

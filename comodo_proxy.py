@@ -2,7 +2,6 @@ import comodo_api
 import configparser
 import logging
 import jsend
-import sys
 
 from flask import Flask, jsonify, request
 from flask_gssapi import GSSAPI
@@ -10,13 +9,18 @@ from flask_restplus import Resource, Api, fields
 from raven.contrib.flask import Sentry
 
 app = Flask(__name__)
-if not app.debug:
-    app.logger.addHandler(logging.StreamHandler(stream=sys.stdout))
-    app.logger.setLevel(logging.INFO)
+
+# Establish logging when running under gunicorn. If running standalone will function as a normal
+# flask server.
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 app.logger.info('comodo_proxy is starting.')
 
 # Configure the application
+
 # SENTRY_DSN must be defined as an environment variable, if not sentry will simply not function, see here:
 # https://docs.sentry.io/clients/python/integrations/flask/
 sentry = Sentry(app)
@@ -248,21 +252,4 @@ class ComodoTLSRequestCertificate(Resource):
 
 
 if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Development Server Help')
-    parser.add_argument("-d", "--debug", action="store_true", dest="debug_mode",
-                        help="run in debug mode (for use with PyCharm)", default=False)
-    parser.add_argument("-p", "--port", dest="port",
-                        help="port of server (default:%(default)s)", type=int, default=5000)
-
-    cmd_args = parser.parse_args()
-    app_options = {'port': cmd_args.port}
-    app_options['host'] = '0.0.0.0'
-
-    if cmd_args.debug_mode:
-        app_options['debug'] = True
-        app_options['use_debugger'] = False
-        app_options['use_reloader'] = True
-
-    app.run(**app_options)
+    app.run(host='0.0.0.0', port=8000, debug=True)
