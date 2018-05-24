@@ -30,7 +30,7 @@ The keytab to be used, another source location can be used if needed( for instan
 /etc/krb5.keytab should be where it is mapped to in the container for ease. The keytab should not be world readable
 so chgrp it to 0 mode 640 and note the SELinux section below.
 - /etc/krb5.conf:/etc/krb5.conf:ro
-The krb5.conf file to let kerberos kno how to operate
+The krb5.conf file to let kerberos know how to operate
 - /etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro
 If two factor authentication is being used against Comodo's API, the location of the public client certificate.
 - /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro

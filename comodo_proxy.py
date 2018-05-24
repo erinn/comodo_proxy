@@ -94,7 +94,7 @@ csr_model = api.model('CSR Model',
                                      example='1.example.com,2.example.com'),
                        'term': fields.Integer(required=True,
                                               description='The term in years for the certificate', min=1, max=3,
-                                              example=3)
+                                              example=2)
                        }
                       )
 
@@ -213,7 +213,8 @@ class ComodoTLSRequestCertificate(Resource):
 
         body = request.get_json()
 
-        app.logger.debug('User: %s CSR: %s' % (username, body['csr']))
+        app.logger.debug('User: %s CSR: %s, Server Type: %s, Subject Alt Names: %s, Term: %s,' %
+                         (username, body['csr'], body['server_type'], body['subject_alt_names'], body['term']))
 
         result = comodo.submit(cert_type_name=body['cert_type_name'],
                                csr=body['csr'],
