@@ -21,8 +21,8 @@ app.logger.info('comodo_proxy is starting.')
 
 # Configure the application
 
-# SENTRY_DSN must be defined as an environment variable, if not sentry will simply not function, see here:
-# https://docs.sentry.io/clients/python/integrations/flask/
+# SENTRY_DSN must be defined as an environment variable, if not, sentry will simply not function (which is fine),
+# see here: https://docs.sentry.io/clients/python/integrations/flask/
 sentry = Sentry(app)
 
 # Pull in the configuration without interpolation for any special password characters
@@ -54,11 +54,10 @@ app.config.SWAGGER_UI_JSONEDITOR = True
 api = Api(app)
 gssapi = GSSAPI(app)
 
-
 # Load the ACL
 try:
     with open('/etc/comodo_proxy/acl', 'r') as f:
-        acl_list=[line.rstrip('\n') for line in f]
+        acl_list = [line.rstrip('\n') for line in f]
 except IOError:
     app.logger.critical('Unable to open /etc/comodo_proxy/acl')
 
