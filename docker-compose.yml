@@ -21,3 +21,13 @@ services:
      # will be able to accept connections from anywhere but the proxy, it can be set to
      # specific IPs for more safety, see here: http://docs.gunicorn.org/en/latest/settings.html#forwarded-allow-ips
      FORWARDED_ALLOW_IPS: '*'
+
+  db:
+    image: "centos/mariadb-102-centos7"
+    environment:
+      MYSQL_USER: 'comodo_proxy'
+      MYSQL_PASSWORD: 'echee4yeloa0Iajienu9thahGhoo4x'
+      MYSQL_DATABASE: 'comodo_proxy'
+      MYSQL_ROOT_PASSWORD: 'ohy0oocah3seel7rei0UotiechoBoh'
+    ports:
+    - "8001:3306"

@@ -1,1 +1,1 @@
-from comodo_proxy import app as application
+from app import app as application
