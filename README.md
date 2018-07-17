@@ -23,21 +23,12 @@ appropriate mount points, see below.
 ## Mounts:
 The container requires the following mounts in order to work (all files on the host must, obviously, 
 be readable by the container, the container runs as user 1001:0 set permissions accordingly):
-- /etc/comodo_proxy/comodo_proxy.ini:/etc/comodo_proxy/comodo_proxy.ini:ro
-The main configuration file whose options are detailed below.
 - /etc/krb5.keytab:/etc/krb5.keytab:ro
 The keytab to be used, another source location can be used if needed( for instance /etc/keytabs/krb5-HTTP.keytab) but 
 /etc/krb5.keytab should be where it is mapped to in the container for ease. The keytab should not be world readable
 so chgrp it to 0 mode 640 and note the SELinux section below.
 - /etc/krb5.conf:/etc/krb5.conf:ro
 The krb5.conf file to let kerberos know how to operate
-- /etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro
-If two factor authentication is being used against Comodo's API, the location of the public client certificate.
-- /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro
-If two factor authentication is being used against Comodo's API, the location of the private client key. Again a file
-that should only be readable by the container user, chgrp to 0 and mode 640.
-- /etc/comodo_proxy/acl:/etc/comodo_proxy/acl:ro
-The ACL file, simply one principle per line, documented below.
 
 All mounts are read only, as nothing should change on the host.
 

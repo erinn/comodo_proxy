@@ -1,4 +1,5 @@
-from app import app, db
+from app import app, db as application
+from app import db
 from app.db_models import Certificate, Principles
 
 @app.shell_context_processor
