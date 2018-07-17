@@ -1,7 +1,10 @@
 comodo-api
 blinker
+flask
 flask-gssapi
+Flask-Migrate
 flask-restplus
+flask-shell-ipython
 gunicorn
 pyjsend
 raven

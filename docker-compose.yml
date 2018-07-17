@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    image: "comodo_proxy:latest"
+    image: "comodo_proxy:dev"
     ports:
     - "8080:8080"
     volumes:
@@ -21,6 +21,7 @@ services:
      # will be able to accept connections from anywhere but the proxy, it can be set to
      # specific IPs for more safety, see here: http://docs.gunicorn.org/en/latest/settings.html#forwarded-allow-ips
      FORWARDED_ALLOW_IPS: '*'
+     SQLALCHEMY_DATABASE_URI: 'mysql://comodo_proxy:echee4yeloa0Iajienu9thahGhoo4x@db/comodo_proxy'
 
   db:
     image: "centos/mariadb-102-centos7"
