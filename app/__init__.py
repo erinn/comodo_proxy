@@ -72,3 +72,4 @@ if __name__ != '__main__':
     app.logger.setLevel(gunicorn_logger.level)
 
 app.logger.info('comodo_proxy is starting.')
+app.logger.debug('comodo_proxy config: %s' % app.config)
