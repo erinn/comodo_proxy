@@ -10,7 +10,7 @@ class Config(object):
     COMODO_CERT_TYPE_NAME = os.environ.get('COMODO_CERT_TYPE_NAME') or 'Comodo Unified Communications Certificate'
     # Map string to a boolean, if no value is set, default is False
     COMODO_CLIENT_CERT_AUTH = os.environ.get('COMODO_CLIENT_CERT_AUTH') in ['True', 'true', '1']
-    # Path to the public ccertificate
+    # Path to the public certificate
     COMODO_CLIENT_PUBLIC_CERT = os.environ.get('COMODO_CLIENT_PUBLIC_CERT') or ''
     # Path to the private key
     COMODO_CLIENT_PRIVATE_KEY = os.environ.get('COMODO_CLIENT_PRIVATE_KEY') or ''

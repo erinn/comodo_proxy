@@ -6,6 +6,7 @@ Flask-Migrate
 flask-restplus
 flask-shell-ipython
 gunicorn
+mysql-connector
 pyjsend
 raven
 

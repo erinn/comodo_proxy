@@ -40,7 +40,7 @@ from app.db_models import Principles, Certificate
 @app.before_request
 def populate_acl():
     '''
-    This function populates the ACL list from the DB before each and every request (as the DB may change without
+    This function populates the ACL list from the DB before each request (as the DB may change without
     the apps knowledge).
 
     This function takes no arguments and returns nothing

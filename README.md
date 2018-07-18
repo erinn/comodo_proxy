@@ -27,8 +27,9 @@ be readable by the container, the container runs as user 1001:0 set permissions 
 The keytab to be used, another source location can be used if needed( for instance /etc/keytabs/krb5-HTTP.keytab) but 
 /etc/krb5.keytab should be where it is mapped to in the container for ease. The keytab should not be world readable
 so chgrp it to 0 mode 640 and note the SELinux section below.
-- /etc/krb5.conf:/etc/krb5.conf:ro
-The krb5.conf file to let kerberos know how to operate
+- /etc/krb5.conf:/etc/krb5.conf:ro The krb5.conf file to let kerberos know how to operate
+-/etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro If two factor authentication is being used against Comodo's API, the location of the public client certificate.
+- /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro If two factor authentication is being used against Comodo's API, the location of the private client key. Again a file that should only be readable by the container user, chgrp to 0 and mode 640.
 
 All mounts are read only, as nothing should change on the host.
 
@@ -44,40 +45,24 @@ For ease of use during development, the docker-compose.yml file has been provide
 that is brought up can be placed behind any proxy (nginx, apache, see below). However it is set to trust all headers
 by default, this is dangerous and should only be used for development or in a highly controlled environment.
 
-## comodo_proxy.ini:
-The comodo_proxy.ini file contains most of the configuration directives for the application and is documented below:
 
-    [default]
-    # The URL of the Comodo API server
-    api_url=https://hard.cert-manager.com/private/ws/EPKIManagerSSL?wsdl
-    # The Comodo certificate type you wish to use
-    cert_type_name=PlatinumSSL Certificate
-    # The Comodo customer's login URI
-    customer_login_uri=example
-    # Enable debugging by setting to true
-    debug=false
-    # The Comodo user to log in as
-    login=
-    # The Comodo organization ID to use
-    org_id=
-    # The Comodo password for the user
-    password=
-    # The password to set for revocation of Comodo certificates (does not appear to be used anywhere but 
-    # Comodo requires it).
-    revoke_password=
-    # Comodo's secret key
-    secret_key=
-    # Whether to use two factor authentication with Comodo using a client certificate
-    client_cert_auth=True
-    # If using 2FA the location of the public certificate
-    client_public_certificate=/etc/pki/tls/certs/comodo_client.crt
-    # If using 2FA the location of the private certificate
-    client_private_key=/etc/pki/tls/private/comodo_client.key
-    # Because this is run in a container the hostname will not match the kerberos principle and as such needs to 
-    # be overriden, set this to the kerberos principle's name.
-    gssapi_hostname=api.example.com
-    # You can select the GSSAPI service name to use here, if omitted HTTP will be used.
-    gssapi_servicename=host
+## Environmental Variables:
+The comodo_proxy app consumes all of its configuration via the following environmental variables:
+- COMODO_API_URL: The URL for the Comodo API, for example: 'https://hard.cert-manager.com/private/ws/EPKIManagerSSL?wsdl'
+- COMODO_CERT_TYPE_NAME: The certificate type name to use for requests for example: 'Comodo Unified Communications Certificate'
+- COMODO_CLIENT_CERT_AUTH: Set to 'True' if you need to use client certificate authentication with Comodo.
+- COMODO_CLIENT_PUBLIC_CERT: The path to the public certificate in PEM encoded format.
+- COMODO_CLIENT_PRIVATE_KEY: The path to the private key.
+- COMODO_CUSTOMER_LOGIN_URI: The customer login URI, example 'example-corp'.
+- COMODO_LOGIN: The actual login to Comodo, or user name as a synonym.
+- COMODO_ORG_ID: The Organization ID given to you by Comodo, example '123456'.
+- COMODO_PASSWORD: The password for your login or user name.
+- COMODO_REVOKE_PASSWORD: The password to set for revocation of Comodo certificates (does not appear to be used anywhere but Comodo requires it).
+- COMODO_SECRET_KEY: Comodo's secret key.
+- GSSAPI_HOSTNAME: Because this is run in a container the hostname will not match the kerberos principle and as such needs to be overriden, set this to the kerberos principle's name.
+- GSSAPI_SERVICE_NAME: You can select the GSSAPI service name to use here, if omitted HTTP will be used.
+- SECRET_KEY: The secret key for flask to encrypt data with.
+- DATABASE_URL: A full URL for the database, example: mysql+mysqlconnector://<DB User>:<DB Password>@<DB Host>:<DB Port>/<DB Name>
 
 # The comodo_proxy ACL file:
 The 'acl' file, located in /etc/comodo_proxy/acl in the container is simply formatted as one principle per line, for
