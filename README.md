@@ -28,24 +28,42 @@ The keytab to be used, another source location can be used if needed( for instan
 /etc/krb5.keytab should be where it is mapped to in the container for ease. The keytab should not be world readable
 so chgrp it to 0 mode 640 and note the SELinux section below.
 - /etc/krb5.conf:/etc/krb5.conf:ro The krb5.conf file to let kerberos know how to operate
--/etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro If two factor authentication is being used against Comodo's API, the location of the public client certificate.
+- /etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro If two factor authentication is being used against Comodo's API, the location of the public client certificate.
 - /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro If two factor authentication is being used against Comodo's API, the location of the private client key. Again a file that should only be readable by the container user, chgrp to 0 and mode 640.
 
 All mounts are read only, as nothing should change on the host.
 
 ### Mounts and SELinux
-If you are unfortunate enough to be working in an SELinux environment you MIGHT have to change the context of 
-some files, in the above mounts /etc/krb5.keytab would need the context changed to svirt_sandbox_file_t so the container
-can read it. Most, but not all files in /etc/ on the host are readable by docker.
+If you are unfortunate enough to be working in an SELinux environment you MIGHT have to develop a custom
+policy module to allow access to the kerberos keytab, configuration file, and certificates an example is included below.
 
 There is a bug open about this here: https://bugzilla.redhat.com/show_bug.cgi?id=1532386
 
-## Development:
-For ease of use during development, the docker-compose.yml file has been provided with all mounts listed. The image
-that is brought up can be placed behind any proxy (nginx, apache, see below). However it is set to trust all headers
-by default, this is dangerous and should only be used for development or in a highly controlled environment.
+    # Only needed until https://bugzilla.redhat.com/show_bug.cgi?id=1532386 is
+    # closed
+    module docker_kerberos 1.0;
+    
+    require {
+            type krb5_conf_t;
+            type krb5_keytab_t;
+            type container_t;
+            type cert_t;
+            class file { getattr lock open read };
+    }
+    
+    #============= container_t ==============
+    allow container_t krb5_conf_t:file getattr;
+    allow container_t krb5_conf_t:file { open read };
+    allow container_t  krb5_keytab_t:file lock;
+    allow container_t  krb5_keytab_t:file { open read };
+    allow container_t cert_t:file getattr;
+    allow container_t cert_t:file { open read };
 
-
+Place the above into a docker_kerberos.te file, compile it into a module and then insert the module:
+ - checkmodule -M -m -o docker_kerberos.mod docker_kerberos.te
+ - semodule_package -o docker_kerberos.pp docker_kerberos.mod
+ - sudo semodule -i docker_kerberos.pp 
+ 
 ## Environmental Variables:
 The comodo_proxy app consumes all of its configuration via the following environmental variables:
 - COMODO_API_URL: The URL for the Comodo API, for example: 'https://hard.cert-manager.com/private/ws/EPKIManagerSSL?wsdl'
@@ -63,15 +81,6 @@ The comodo_proxy app consumes all of its configuration via the following environ
 - GSSAPI_SERVICE_NAME: You can select the GSSAPI service name to use here, if omitted HTTP will be used.
 - SECRET_KEY: The secret key for flask to encrypt data with.
 - DATABASE_URL: A full URL for the database, example: mysql+mysqlconnector://<DB User>:<DB Password>@<DB Host>:<DB Port>/<DB Name>
-
-# The comodo_proxy ACL file:
-The 'acl' file, located in /etc/comodo_proxy/acl in the container is simply formatted as one principle per line, for
-example:
-
-    api-user@EXAMPLE.COM
-    api-user2@EXAMPLE.COM
-
-The first part before the '@' is the user/host/service definition, the second is the Kerberos realm.
 
 # Proxying for the Container:
 You will probably not want the container exposing gunicorn, instead a proxy is recommended using either apache or nginx.
@@ -136,3 +145,15 @@ For apache:
             ProxyPass "/" "http://localhost:8080/"
             ProxyPassReverse "/" "http://localhost:8080/"
     </VirtualHost>
+    
+# Development:
+For ease of use during development, the docker-compose.yml file has been provided with all mounts listed. The image
+that is brought up can be placed behind any proxy (nginx, apache, see below). However it is set to trust all headers
+by default, this is dangerous and should only be used for development or in a highly controlled environment.
+
+It is expected that the developer will user a docker-compose.override.yaml file to override any sensitive or incorrect
+environmental variables. 
+
+At this point the DB is not automatically populated when the containers come up. In the root of the source
+code directory you can set the DATABASE_URI environmental variable to point to the container and run 'flask db upgrade'
+this will populate the DB.
