@@ -2,8 +2,10 @@ import jsend
 
 from app.api_models import *
 from app import api, app, comodo, gssapi
+from .db_models import Certificate
 from flask import g, jsonify, request
 from flask_restplus import Resource
+from OpenSSL.crypto import load_certificate, FILETYPE_PEM
 
 def user_authorized(username):
     if username in g.acl_list:
@@ -33,6 +35,12 @@ class ComodoCertificate(Resource):
             app.logger.debug('User: %s request status: %s' % (username, result['status']))
 
             if result['status'] == 'success':
+                # If issued we insert it into the DB
+                if result['data']['certificate_status'] == 'issued':
+                    hash = sha256()
+                    hex = hash.update(result['data']['certificate']).hexdigest()
+                    cert = Certificate()
+
                 return jsonify(result), 200
             else:
                 return jsonify(result), 400

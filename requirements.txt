@@ -8,5 +8,6 @@ flask-shell-ipython
 gunicorn
 mysql-connector
 pyjsend
+pyopenssl
 raven
 

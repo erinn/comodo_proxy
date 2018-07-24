@@ -63,6 +63,17 @@ def populate_acl():
 
     return None
 
+@app.before_request
+def initialize_db():
+    '''
+    This function intializes the DB and places it in g.db.
+
+    :return: None
+    '''
+
+    g.db = db
+
+    return None
 
 # Establish logging when running under gunicorn. If running standalone will function as a normal
 # flask server.
