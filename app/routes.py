@@ -2,10 +2,10 @@ import jsend
 
 from app.api_models import *
 from app import api, app, comodo, gssapi
-from .db_models import Certificate
+from .db_models import Certificate, Principles
 from flask import g, jsonify, request
 from flask_restplus import Resource
-from OpenSSL.crypto import load_certificate, FILETYPE_PEM
+from app.cert import get_cn, get_sha256_hash
 
 def user_authorized(username):
     if username in g.acl_list:
@@ -16,6 +16,15 @@ def user_authorized(username):
         return False
 
     return None
+
+# @api.route('/comodo/v1.0/<str:sha256_hash>')
+# @api.doc(params={'sha256_hash': 'The hex representation of the SHA256 hash of the certificate.'})
+# @api.response(404, 'Hash not found')
+# class ComodoCertificateHash(Resource):
+#     @gssapi.require_auth
+#     def get(self, sha256_hash, username=''):
+#         if user_authorized(username):
+#
 
 @api.route('/comodo/v1.0/<int:certificate_id>')
 @api.doc(params={'certificate_id': 'The certificate ID'})
@@ -35,11 +44,16 @@ class ComodoCertificate(Resource):
             app.logger.debug('User: %s request status: %s' % (username, result['status']))
 
             if result['status'] == 'success':
-                # If issued we insert it into the DB
+
+                # If the certificate is issued we insert it into the DB
                 if result['data']['certificate_status'] == 'issued':
-                    hash = sha256()
-                    hex = hash.update(result['data']['certificate']).hexdigest()
-                    cert = Certificate()
+                    hash = get_sha256_hash(result['data']['certificate'])
+                    cn = get_cn(result['data']['certificate'])
+                    id = result['data']['certificate_id']
+                    principle = Principles.query.filter_by(principle=username).first()
+                    cert = Certificate(id=id, cert_sha256=hash, cert_fqdn=cn, principle_id=principle)
+                    g.db.session.add(cert)
+                    g.db.session.commit()
 
                 return jsonify(result), 200
             else:

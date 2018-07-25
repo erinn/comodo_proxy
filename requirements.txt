@@ -1,5 +1,6 @@
-comodo-api
 blinker
+comodo-api
+cryptography
 flask
 flask-gssapi
 Flask-Migrate

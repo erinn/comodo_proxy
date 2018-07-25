@@ -10,6 +10,8 @@ from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 
+__version__ = '0.2.0'
+
 app = Flask(__name__)
 
 # SENTRY_DSN must be defined as an environment variable, if not, sentry will simply not function (which is fine),
@@ -82,5 +84,5 @@ if __name__ != '__main__':
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-app.logger.info('comodo_proxy is starting.')
+app.logger.info('comodo_proxy %s starting.' % __version__)
 app.logger.debug('comodo_proxy config: %s' % app.config)

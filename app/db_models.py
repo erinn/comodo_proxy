@@ -17,7 +17,7 @@ class Certificate(db.Model):
 
     id = db.Column(db.Integer, primary_key= True)
     cert_fqdn = db.Column(db.String(300))
-    cert_sha256 = db.Column(db.String(96))
+    cert_sha256 = db.Column(db.String(64))
     principle_id = db.Column(db.Integer, db.ForeignKey('principles.id'))
 
     def __repr__(self):
