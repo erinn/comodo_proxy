@@ -12,7 +12,7 @@ def get_sha256_hash(pem):
     :rtype: str
     '''
 
-    cert = x509.load_pem_x509_certificate(pem, default_backend())
+    cert = x509.load_pem_x509_certificate(pem.encode('utf-8'), default_backend())
     h = cert.fingerprint(hashes.SHA256())
 
     return h.hex()
@@ -27,7 +27,7 @@ def get_cn(pem):
     :rtype: str
     '''
 
-    cert = x509.load_pem_x509_certificate(pem, default_backend())
+    cert = x509.load_pem_x509_certificate(pem.encode('utf-8'), default_backend())
     oid = x509.ObjectIdentifier('2.5.4.3')
     cn = cert.subject.get_attributes_for_oid(oid)[0].value
 
