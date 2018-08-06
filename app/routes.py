@@ -82,7 +82,6 @@ class ComodoTLSRequestCertificate(Resource):
 
             result = comodo.submit(cert_type_name=body['cert_type_name'],
                                    csr=body['csr'],
-                                   revoke_password=body['revoke_password'],
                                    server_type=body['server_type'],
                                    subject_alt_names=body.get('subject_alt_names', ''),
                                    term=body['term'])

@@ -1,4 +1,4 @@
-comodo_proxy is a simle(ish) proxy between Comodo's SOAP API and a custom and minimal REST API. comodo_proxy
+comodo_proxy is a simle(ish) proxy between Comodo's REST API and a custom and minimal REST API. comodo_proxy
 is designed to be deployed in a Kerberos/GSSAPI environment as access control is handled via principles, the code
 could be modified for simple auth easily. 
 

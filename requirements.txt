@@ -1,4 +1,4 @@
-comodo-api
+comodo-rest-api
 blinker
 flask
 flask-gssapi
