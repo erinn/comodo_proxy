@@ -1,7 +1,7 @@
 import jsend
 
 from app.api_models import *
-from app import api, app, comodo, gssapi
+from app import api, app, comodo, db, gssapi
 from .db_models import Certificate, Principles
 from flask import g, jsonify, request
 from flask_restplus import Resource
@@ -52,8 +52,8 @@ class ComodoCertificate(Resource):
                     id = result['data']['certificate_id']
                     principle = Principles.query.filter_by(principle=username).first()
                     cert = Certificate(id=id, cert_sha256=hash, cert_fqdn=cn, principle_id=principle)
-                    g.db.session.add(cert)
-                    g.db.session.commit()
+                    db.session.add(cert)
+                    db.session.commit()
 
                 return jsonify(result), 200
             else:
