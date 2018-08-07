@@ -35,6 +35,7 @@ services:
      COMODO_PASSWORD: 'example-password'
      GSSAPI_HOSTNAME: 'example.com'
      GSSAPI_SERVICE_NAME: 'HTTP'
+     # This is a secret key for flask, nothing to do with Comodo
      SECRET_KEY: 'Random secret key'
      SENTRY_DSN: ''
 
