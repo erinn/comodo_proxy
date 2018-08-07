@@ -33,8 +33,6 @@ services:
      # The dollar sign '$' if used in a password needs to be doubled '$$' in order for docker-compose to
      # not try to substitute a value: https://docs.docker.com/compose/compose-file/#variable-substitution
      COMODO_PASSWORD: 'example-password'
-     COMODO_REVOKE_PASSWORD: 'example-revoke-password'
-     COMODO_SECRET_KEY: 'example-secret-key'
      GSSAPI_HOSTNAME: 'example.com'
      GSSAPI_SERVICE_NAME: 'HTTP'
      SECRET_KEY: 'Random secret key'

@@ -18,8 +18,6 @@ class Config(object):
     COMODO_LOGIN = os.environ.get('COMODO_LOGIN') or ''
     COMODO_ORG_ID = os.environ.get('COMODO_ORG_ID') or ''
     COMODO_PASSWORD = os.environ.get('COMODO_PASSWORD') or ''
-    COMODO_REVOKE_PASSWORD = os.environ.get('COMODO_REVOKE_PASSWORD') or ''
-    COMODO_SECRET_KEY = os.environ.get('COMODO_SECRET_KEY') or ''
 
     GSSAPI_HOSTNAME = os.environ.get('GSSAPI_HOSTNAME') or socket.gethostname()
     GSSAPI_SERVICE_NAME = os.environ.get('GSSAPI_SERVICE_NAME') or 'HTTP'
