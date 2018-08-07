@@ -22,7 +22,7 @@ services:
      DATABASE_URL: 'mysql+mysqlconnector://comodo_proxy:echee4yeloa0Iajienu9thahGhoo4x@db/comodo_proxy'
      # The following are stub entries, the user should use a docker-compose.override.yaml file to fill in
      # entries for the following environment variables. For explanations of the variables check the README
-     COMODO_API_URL: 'https://hard.cert-manager.com/private/ws/EPKIManagerSSL?wsdl'
+     COMODO_API_URL: 'https://hard.cert-manager.com/api/ssl/v1/'
      COMODO_CERT_TYPE_NAME: 'Comodo Unified Communications Certificate'
      COMODO_CLIENT_CERT_AUTH: 'False'
      COMODO_CLIENT_PUBLIC_CERT: '/etc/pki/tls/certs/comodo_client.crt'
