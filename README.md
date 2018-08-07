@@ -75,8 +75,6 @@ The comodo_proxy app consumes all of its configuration via the following environ
 - COMODO_LOGIN: The actual login to Comodo, or user name as a synonym.
 - COMODO_ORG_ID: The Organization ID given to you by Comodo, example '123456'.
 - COMODO_PASSWORD: The password for your login or user name.
-- COMODO_REVOKE_PASSWORD: The password to set for revocation of Comodo certificates (does not appear to be used anywhere but Comodo requires it).
-- COMODO_SECRET_KEY: Comodo's secret key.
 - GSSAPI_HOSTNAME: Because this is run in a container the hostname will not match the kerberos principle and as such needs to be overriden, set this to the kerberos principle's name.
 - GSSAPI_SERVICE_NAME: You can select the GSSAPI service name to use here, if omitted HTTP will be used.
 - SECRET_KEY: The secret key for flask to encrypt data with.
