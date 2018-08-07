@@ -13,14 +13,11 @@ status_response_model = api.model('Status Response',
 csr_model = api.model('CSR Model',
                       {'cert_type_name':
                        fields.String(required=True,
-                                     description='The full cert type name', example='PlatinumSSL Certificate'),
+                                     description='The full cert type name', example='Comodo Unified Communications Certificate'),
                        'csr':
                        fields.String(required=True, description='The Certificate Signing Request',
                                      example='-----BEGIN CERTIFICATE REQUEST-----\n[CSR GOES HERE]\n'
                                              '-----END CERTIFICATE REQUEST-----'),
-                       'revoke_password':
-                       fields.String(required=True, description='A password for certificate revocation',
-                                     example='BadPassword'),
                        'server_type':
                        fields.String(required=True,
                                      description='The type of server for the TLS certificate',
@@ -30,8 +27,8 @@ csr_model = api.model('CSR Model',
                                      description='Subject Alternative Names separated by a ",".',
                                      example='1.example.com,2.example.com'),
                        'term': fields.Integer(required=True,
-                                              description='The term in years for the certificate', min=1, max=3,
-                                              example=2)
+                                              description='The term in days, for the certificate', min=365, max=730,
+                                              example=730)
                        }
                       )
 
@@ -45,7 +42,7 @@ csr_response_model = api.inherit('CSR Response Model', status_response_model,
 
 certificate_model = api.model('Certificate Info Model',
                               {'format_type': fields.String(description='Comodo supported format types',
-                                                            example='X509 PEM Bundle'),
+                                                            example='x509CO'),
                               }
                              )
 
@@ -55,11 +52,11 @@ certificate_info_data = api.model('Certificate Info Data Model',
                                                              example='Apache/ModSSL')),
                                    'format_type': fields.List(
                                                    fields.String(description='Comodo supported format types',
-                                                                 example='X509 PEM Bundle')),
+                                                                 example='x509CO')),
                                    'cert_types': fields.List(
                                                    fields.String(
                                                        description='The certificate types supported for the user',
-                                                       example='PlatinumSSL Certificate')),
+                                                       example='Comodo Unified Communications Certificate')),
                                   }
                                  )
 

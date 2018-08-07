@@ -6,7 +6,7 @@ basedir = pathlib.Path.cwd()
 
 
 class Config(object):
-    COMODO_API_URL = os.environ.get('COMODO_API_URL') or 'https://hard.cert-manager.com/private/ws/EPKIManagerSSL?wsdl'
+    COMODO_API_URL = os.environ.get('COMODO_API_URL') or 'https://hard.cert-manager.com/api/ssl/v1/'
     COMODO_CERT_TYPE_NAME = os.environ.get('COMODO_CERT_TYPE_NAME') or 'Comodo Unified Communications Certificate'
     # Map string to a boolean, if no value is set, default is False
     COMODO_CLIENT_CERT_AUTH = os.environ.get('COMODO_CLIENT_CERT_AUTH') in ['True', 'true', '1']
