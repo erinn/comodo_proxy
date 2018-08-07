@@ -18,10 +18,6 @@ csr_model = api.model('CSR Model',
                        fields.String(required=True, description='The Certificate Signing Request',
                                      example='-----BEGIN CERTIFICATE REQUEST-----\n[CSR GOES HERE]\n'
                                              '-----END CERTIFICATE REQUEST-----'),
-                       'server_type':
-                       fields.String(required=True,
-                                     description='The type of server for the TLS certificate',
-                                     example='Apache/ModSSL'),
                        'subject_alt_names':
                        fields.String(required=True,
                                      description='Subject Alternative Names separated by a ",".',
@@ -82,7 +78,7 @@ certificate_response_model = api.inherit('Certificate Response Model', status_re
 revoke_model = api.model('Revoke Model',
                          {'reason':
                           fields.String(description='Reason for revocation, must not be blank',
-                                        example='Key compromise')
+                                        example='Key compromise', required=True)
                           }
                          )
 
