@@ -10,7 +10,7 @@ from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 
-__version__ = '0.2.0'
+__version__ = '0.4.0'
 
 app = Flask(__name__)
 
@@ -65,24 +65,12 @@ def populate_acl():
 
     return None
 
-@app.before_request
-def initialize_db():
-    '''
-    This function intializes the DB and places it in g.db.
-
-    :return: None
-    '''
-
-    g.db = db
-
-    return None
-
 # Establish logging when running under gunicorn. If running standalone will function as a normal
 # flask server.
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
+# if __name__ != '__main__':
+#     gunicorn_logger = logging.getLogger('gunicorn.error')
+#     app.logger.handlers = gunicorn_logger.handlers
+#     app.logger.setLevel(gunicorn_logger.level)
 
 app.logger.info('comodo_proxy %s starting.' % __version__)
 app.logger.debug('comodo_proxy config: %s' % app.config)

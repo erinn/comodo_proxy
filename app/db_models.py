@@ -7,7 +7,7 @@ class Principles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     principle = db.Column(db.String(64), unique=True)
     active = db.Column(db.Boolean)
-    certificates = db.relationship('Certificate', backref='principle')
+    certificates = db.relationship('Certificate', backref='principle', lazy='dynamic')
 
     def __repr__(self):
         return '<Principle:{}, Active:{}>'.format(self.principle, self.active)
@@ -21,4 +21,4 @@ class Certificate(db.Model):
     principle_id = db.Column(db.Integer, db.ForeignKey('principles.id'))
 
     def __repr__(self):
-        return '<ID:{}, Certificate:{}, SHA256:{}>'.format(self.id, self.cert_fqdn, self.cert_sha256)
+        return '<Certificate:{}, SHA256:{}>'.format(self.cert_fqdn, self.cert_sha256)
