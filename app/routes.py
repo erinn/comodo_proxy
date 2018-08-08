@@ -99,13 +99,11 @@ class ComodoTLSRequestCertificate(Resource):
 
             body = request.get_json()
 
-            app.logger.debug('User: %s CSR: %s, Server Type: %s, Subject Alt Names: %s, Term: %s,' %
-                             (username, body['csr'], body['server_type'], body['subject_alt_names'], body['term']))
+            app.logger.debug('User: %s CSR: %s, Subject Alt Names: %s, Term: %s,' %
+                             (username, body['csr'], body['subject_alt_names'], body['term']))
 
             result = comodo.submit(cert_type_name=body['cert_type_name'],
                                    csr=body['csr'],
-                                   revoke_password=body['revoke_password'],
-                                   server_type=body['server_type'],
                                    subject_alt_names=body.get('subject_alt_names', ''),
                                    term=body['term'])
 
@@ -129,7 +127,7 @@ class ComodoTLSRequestCertificate(Resource):
             app.logger.debug('User: %s GET certificate information.' % username)
 
             formats = sorted(list(comodo.formats.keys()))
-            format_type = sorted(list(comodo.format_type.keys()))
+            format_type = sorted(comodo.format_type)
 
             result = comodo.get_cert_types()
 
@@ -137,7 +135,7 @@ class ComodoTLSRequestCertificate(Resource):
 
             if result['status'] == 'success':
                 r = jsend.success({'formats': formats, 'format_type': format_type,
-                                   'cert_types': [x['name'] for x in result['data']['cert_types']]})
+                                   'cert_types': result['data']['types']})
                 return jsonify(r), 200
             else:
                 return jsonify(result), 400

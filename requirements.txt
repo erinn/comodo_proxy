@@ -1,6 +1,5 @@
+comodo-rest-api
 blinker
-comodo-api
-cryptography
 flask
 flask-gssapi
 Flask-Migrate
@@ -9,6 +8,5 @@ flask-shell-ipython
 gunicorn
 mysql-connector
 pyjsend
-pyopenssl
 raven
 

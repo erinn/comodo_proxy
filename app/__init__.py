@@ -1,4 +1,4 @@
-import comodo_api
+import comodo_rest_api
 import logging
 
 
@@ -25,15 +25,15 @@ gssapi = GSSAPI(app)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-comodo = comodo_api.ComodoTLSService(api_url=app.config['COMODO_API_URL'],
-                                     customer_login_uri=app.config['COMODO_CUSTOMER_LOGIN_URI'],
-                                     login=app.config['COMODO_LOGIN'],
-                                     org_id=app.config['COMODO_ORG_ID'],
-                                     password=app.config['COMODO_PASSWORD'],
-                                     client_cert_auth=app.config['COMODO_CLIENT_CERT_AUTH'],
-                                     client_public_certificate= app.config['COMODO_CLIENT_PUBLIC_CERT'],
-                                     client_private_key=app.config['COMODO_CLIENT_PRIVATE_KEY']
-                                     )
+comodo = comodo_rest_api.ComodoTLSService(api_url=app.config['COMODO_API_URL'],
+                                          customer_login_uri=app.config['COMODO_CUSTOMER_LOGIN_URI'],
+                                          login=app.config['COMODO_LOGIN'],
+                                          org_id=app.config['COMODO_ORG_ID'],
+                                          password=app.config['COMODO_PASSWORD'],
+                                          client_cert_auth=app.config['COMODO_CLIENT_CERT_AUTH'],
+                                          client_public_certificate= app.config['COMODO_CLIENT_PUBLIC_CERT'],
+                                          client_private_key=app.config['COMODO_CLIENT_PRIVATE_KEY']
+                                         )
 
 from app import db_models, routes
 from app.db_models import Principles, Certificate
