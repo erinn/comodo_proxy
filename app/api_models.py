@@ -4,10 +4,13 @@ from flask_restplus import fields
 # The following models define the input and output, this mainly aids in documentation for
 # OpenAPI/Swagger
 
-# All responses should inherit the status_response_model, this is basically jsend format, see here:
+# All responses should inherit the sucess_response, this is basically jsend format, see here:
 # https://labs.omniti.com/labs/jsend
-status_response_model = api.model('Status Response',
-                                  {'status': fields.String(description='The Status Message', example='success')})
+sucess_response = api.model('Success Response',
+                            {'status': fields.String(description='The Success Message', example='success')})
+
+failed_response = api.model('Failure Response',
+                            {'status': fields.String(description='The failure Message', example='fail')})
 
 
 csr_model = api.model('CSR Model',
@@ -32,7 +35,7 @@ csr_data_response = api.model('CSR Data Response',
                               {'certificate_id': fields.Integer(description='The Certificate ID', example=1234)},
                              )
 
-csr_response_model = api.inherit('CSR Response Model', status_response_model,
+csr_response_model = api.inherit('CSR Response Model', sucess_response,
                                  {'data': fields.Nested(csr_data_response)}
                                 )
 
@@ -56,24 +59,32 @@ certificate_info_data = api.model('Certificate Info Data Model',
                                   }
                                  )
 
-certificate_info_response_model = api.inherit('Certificate Info Response Model', status_response_model,
+certificate_info_response_model = api.inherit('Certificate Info Response Model', sucess_response,
                                               {'data': fields.Nested(certificate_info_data)}
                                              )
 
-# The certificate data that is returned in the certificate_response_model
-certificate_data_model = api.model('Certificate Data Model',
-                                   {'certificate_id': fields.Integer(description='The Certificate ID', example=1234),
-                                    'certificate': fields.String(description='The certificate',
-                                                                 example='-----BEGIN CERTIFICATE-----\n[CERT HERE]\n'
-                                                                         '-----END CERTIFICATE-----\n'),
-                                    'certificate_status': fields.String(description='Either pending or issued',
-                                                                        example='issued'),
-                                    }
-                                   )
+# The certificate data that is returned in the certificate_collect_response
+cert_collect_data = api.model('Certificate Data Model',
+                              {'certificate_id': fields.Integer(description='The Certificate ID', example=1234),
+                               'certificate': fields.String(description='The certificate',
+                                                            example='-----BEGIN CERTIFICATE-----\n[CERT HERE]\n'
+                                                                    '-----END CERTIFICATE-----\n'),
+                               'certificate_status': fields.String(description='Either pending or issued',
+                                                                   example='issued'),
+                               }
+                              )
 
-certificate_response_model = api.inherit('Certificate Response Model', status_response_model,
-                                         {'data': fields.Nested(certificate_data_model)}
-                                         )
+cert_collect_response = api.inherit('Certificate Response Model', sucess_response,
+                                    {'data': fields.Nested(cert_collect_data)}
+                                    )
+
+cert_renew_data = api.model('Certificate Renewal Data',
+                            {'certificate_id': fields.Integer(description='The Certificate ID', example=1234)}
+                            )
+
+cert_renew_response = api.inherit('Certificate Renew Model', sucess_response,
+                                  {'data': fields.Nested(cert_renew_data)}
+                                  )
 
 revoke_model = api.model('Revoke Model',
                          {'reason':
@@ -82,4 +93,15 @@ revoke_model = api.model('Revoke Model',
                           }
                          )
 
-revoke_response_model = api.inherit('Revoke Response Model', status_response_model)
+revoke_response = api.inherit('Revoke Response Model', sucess_response)
+
+unauthorized_data = api.model('Unauthorized Model',
+                              {'message':
+                                fields.String(description='Auth failure.',
+                                              exmaple='unauthorized')
+                               }
+                              )
+
+unauthorized_response = api.inherit('Unauthorized Response Model', failed_response,
+                                    {'data': fields.Nested(unauthorized_data)}
+                                    )

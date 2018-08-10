@@ -18,13 +18,12 @@ def user_authorized(username):
     return None
 
 @api.route('/comodo/v1.0/<int:certificate_id>')
-@api.route('/comodo/v1.0/tls/<int:certificate_id>')
 @api.route('/comodo/v1.0/tls/collect/<int:certificate_id>')
 @api.doc(params={'certificate_id': 'The certificate ID'})
 @api.response(404, 'Certificate not found')
 class ComodoTLSCertificate(Resource):
     @api.doc(body=certificate_model, )
-    @api.response(200, 'Certificate', certificate_response_model)
+    @api.response(200, 'Certificate', cert_collect_response)
     @gssapi.require_auth()
     def get(self, certificate_id, username=''):
         """Request the signed public key by Certificate ID"""
@@ -61,7 +60,10 @@ class ComodoTLSCertificate(Resource):
             r = jsend.fail({'message': 'unauthorized'})
             return jsonify(r), 403
 
-    @api.response(200, 'Successful', revoke_response_model)
+@api.route('/comodo/v1.0/tls/revoke/<int:certificate_id>')
+class ComodoTLSCertificateRevoke(Resource):
+    @api.response(200, 'Successful', revoke_response)
+    @api.response(403, 'Unauthorized', unauthorized_response)
     @api.doc(body=revoke_model)
     @gssapi.require_auth()
     def delete(self, certificate_id, username=''):
@@ -88,6 +90,7 @@ class ComodoTLSCertificate(Resource):
 
 
 @api.route('/comodo/v1.0/tls')
+@api.route('/comodo/v1.0/tls/enroll')
 class ComodoTLSCertificateEnroll(Resource):
     @api.doc(body=csr_model)
     @api.response(201, 'CSR successfully submitted', csr_response_model)
@@ -146,9 +149,8 @@ class ComodoTLSCertificateEnroll(Resource):
             r = jsend.fail({'message': 'unauthorized'})
             return jsonify(r), 403
 
-
-@api.route('/comodo/v1.0/tls/hash/sha256/<string:hash>')
-@api.doc(params={'hash': "The certificate's sha256 hash"})
+@api.route('/comodo/v1.0/tls/info/sha256/<string:hash>')
+@api.doc(params={'hash': "The certificate's SHA256 hash"})
 @api.response(404, 'Certificate not found')
 class ComodoTLSCertificateInfo(Resource):
     """Request certificate information keying on the SHA256 hash of the certificate"""
@@ -174,11 +176,10 @@ class ComodoTLSCertificateInfo(Resource):
             return jsonify(r), 403
 
 @api.route('/comodo/v1.0/tls/renew/<int:certificate_id>')
-# @api.doc(params={'certificate_id': 'The certificate ID'})
+@api.doc(params={'certificate_id': 'The Certificate ID'})
 @api.response(404, 'Certificate not found')
 class ComodoTLSCertificateRenew(Resource):
-    # @api.doc(body=certificate_model, )
-    # @api.response(200, 'Certificate', certificate_response_model)
+    @api.response(201, 'Certificate', cert_renew_response)
     @gssapi.require_auth()
     def post(self, certificate_id, username=''):
         """Submit a Certificate Renewal for a SSL/TLS certificate"""
@@ -194,7 +195,7 @@ class ComodoTLSCertificateRenew(Resource):
             if result['status'] == 'success':
                 return jsonify(result), 201
             else:
-                return jsonify(result), 400
+                return jsonify(result), 404
         else:
             r = jsend.fail({'message': 'unauthorized'})
             return jsonify(r), 403
