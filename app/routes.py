@@ -154,13 +154,13 @@ class ComodoTLSCertificateInfo(Resource):
     """Request certificate information keying on the SHA256 hash of the certificate"""
 
     @gssapi.require_auth()
-    def get(self,username=''):
+    def get(self, hash, username=''):
         """Retrieve the certificate information"""
 
         if user_authorized(username):
-            app.logger.debug('User: %s, get certificate information on hash: %s' % username, hash)
+            app.logger.debug('User: %s, get certificate information on hash: %s' % (username, hash))
 
-            cert = app.db_queries.certificate_exists(username, hash)
+            cert = certificate_exists(username, hash)
 
             # The certificate exists, return the information
             if cert:
@@ -169,33 +169,27 @@ class ComodoTLSCertificateInfo(Resource):
             else:
                 r = jsend.fail({'message': 'certificate does not exist for principle {}'.format(username)})
                 return jsonify(r), 404
-
+        else:
+            r = jsend.fail({'message': 'unauthorized'})
+            return jsonify(r), 403
 
 @api.route('/comodo/v1.0/tls/renew/<int:certificate_id>')
-@api.doc(params={'certificate_id': 'The certificate ID'})
+# @api.doc(params={'certificate_id': 'The certificate ID'})
 @api.response(404, 'Certificate not found')
-class ComodoTLSCertificate(Resource):
-    @api.doc(body=certificate_model, )
-    @api.response(200, 'Certificate', certificate_response_model)
+class ComodoTLSCertificateRenew(Resource):
+    # @api.doc(body=certificate_model, )
+    # @api.response(200, 'Certificate', certificate_response_model)
     @gssapi.require_auth()
-    def post(self, username=''):
+    def post(self, certificate_id, username=''):
         """Submit a Certificate Renewal for a SSL/TLS certificate"""
 
         if user_authorized(username):
 
-            app.logger.info('User: %s is submitting a CSR' % username)
+            app.logger.info('User: %s is submitting a renewal for certificate ID: %s' % (username, certificate_id))
 
-            body = request.get_json()
+            result = comodo.renew(certificate_id)
 
-            app.logger.debug('User: %s CSR: %s, Subject Alt Names: %s, Term: %s,' %
-                             (username, body['csr'], body['subject_alt_names'], body['term']))
-
-            result = comodo.submit(cert_type_name=body['cert_type_name'],
-                                   csr=body['csr'],
-                                   subject_alt_names=body.get('subject_alt_names', ''),
-                                   term=body['term'])
-
-            app.logger.info('User: %s Result is: %s' % (username, result['status']))
+            app.logger.info('Renewal: User: %s Result is: %s' % (username, result['status']))
 
             if result['status'] == 'success':
                 return jsonify(result), 201
