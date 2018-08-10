@@ -1,5 +1,5 @@
 from app import app, db
-from app.cert import get_cn, get_sha256_hash
+from app.cert import get_cn
 from app.db_models import Certificate, Principles
 
 
@@ -46,7 +46,7 @@ def certificate_exists(principle, sha256_hash):
     app.logger.debug('Performing DB query for principle: %s with cert hash: %s' % (principle, sha256_hash))
 
     result = Principles.query.filter_by(principle=principle).first().certificates\
-             .filter_by(cert_sha256=sha256_hash).first()
+        .filter_by(cert_sha256=sha256_hash).first()
 
     app.logger.debug('Query result: %s' % result)
 
