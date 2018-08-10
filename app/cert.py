@@ -5,7 +5,7 @@ from cryptography import x509
 
 def get_sha256_hash(pem):
     '''
-    This function take a PEM encoded string and returns the SHA256 hash of the certificate as a hex encoded string.
+    This function takes a PEM encoded string and returns the SHA256 hash of the certificate as a hex encoded string.
 
     :param str pem: The PEM encoded certificate as a string
     :return: The SHA 256 hash as a hex string
