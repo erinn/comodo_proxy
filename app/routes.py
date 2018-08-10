@@ -1,11 +1,12 @@
 import jsend
 
 from app.api_models import *
-from app import api, app, comodo, db, gssapi
+from app import api, app, comodo, gssapi
 from app.db_queries import add_certificate, certificate_exists
 from flask import g, jsonify, request
 from flask_restplus import Resource
-from app.cert import get_cn, get_sha256_hash
+from app.cert import get_sha256_hash
+
 
 def user_authorized(username):
     if username in g.acl_list:
@@ -15,7 +16,6 @@ def user_authorized(username):
         app.logger.info('User: %s is denied!' % username)
         return False
 
-    return None
 
 @api.route('/comodo/v1.0/<int:certificate_id>')
 @api.route('/comodo/v1.0/tls/collect/<int:certificate_id>')
@@ -60,6 +60,7 @@ class ComodoTLSCertificate(Resource):
         else:
             r = jsend.fail({'message': 'unauthorized'})
             return jsonify(r), 403
+
 
 @api.route('/comodo/v1.0/tls/revoke/<int:certificate_id>')
 @api.response(403, 'Unauthorized', unauthorized_response)
