@@ -1,7 +1,6 @@
 import comodo_rest_api
 import logging
 
-
 from config import Config
 from flask import Flask, g
 from flask_gssapi import GSSAPI
@@ -31,9 +30,9 @@ comodo = comodo_rest_api.ComodoTLSService(api_url=app.config['COMODO_API_URL'],
                                           org_id=app.config['COMODO_ORG_ID'],
                                           password=app.config['COMODO_PASSWORD'],
                                           client_cert_auth=app.config['COMODO_CLIENT_CERT_AUTH'],
-                                          client_public_certificate= app.config['COMODO_CLIENT_PUBLIC_CERT'],
+                                          client_public_certificate=app.config['COMODO_CLIENT_PUBLIC_CERT'],
                                           client_private_key=app.config['COMODO_CLIENT_PRIVATE_KEY']
-                                         )
+                                          )
 
 from app import db_models, routes
 from app.db_models import Principles, Certificate
@@ -41,14 +40,14 @@ from app.db_models import Principles, Certificate
 
 @app.before_request
 def populate_acl():
-    '''
+    """
     This function populates the ACL list from the DB before each request (as the DB may change without
     the apps knowledge).
 
     This function takes no arguments and returns nothing
 
     :return: None
-    '''
+    """
     result = []
 
     for i in Principles.query.filter(Principles.active == True):
@@ -65,12 +64,13 @@ def populate_acl():
 
     return None
 
+
 # Establish logging when running under gunicorn. If running standalone will function as a normal
 # flask server.
-# if __name__ != '__main__':
-#     gunicorn_logger = logging.getLogger('gunicorn.error')
-#     app.logger.handlers = gunicorn_logger.handlers
-#     app.logger.setLevel(gunicorn_logger.level)
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 app.logger.info('comodo_proxy %s starting.' % __version__)
 app.logger.debug('comodo_proxy config: %s' % app.config)
