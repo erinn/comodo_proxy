@@ -36,7 +36,7 @@ class ComodoTLSCertificate(Resource):
 
             result = comodo.collect(cert_id=certificate_id, format_type=body['format_type'])
 
-            app.logger.debug('User: %s request status: %s' % (username, result['status']))
+            app.logger.info('User: %s request status: %s' % (username, result['status']))
 
             if result['status'] == 'success':
 
@@ -132,14 +132,14 @@ class ComodoTLSCertificateEnroll(Resource):
 
         if user_authorized(username):
 
-            app.logger.debug('User: %s GET certificate information.' % username)
+            app.logger.info('User: %s GET general certificate information.' % username)
 
             formats = sorted(list(comodo.formats.keys()))
             format_type = sorted(comodo.format_type)
 
             result = comodo.get_cert_types()
 
-            app.logger.debug('User: %s GET certificate information, result: %s.' % (username, result['status']))
+            app.logger.info('User: %s GET certificate information, result: %s.' % (username, result['status']))
 
             if result['status'] == 'success':
                 r = jsend.success({'formats': formats, 'format_type': format_type,
@@ -164,15 +164,17 @@ class ComodoTLSCertificateInfo(Resource):
         """Retrieve the certificate details"""
 
         if user_authorized(username):
-            app.logger.debug('User: %s, get certificate information on hash: %s' % (username, hash))
+            app.logger.info('User: %s, GET certificate information on hash: %s' % (username, hash))
 
             cert = certificate_exists(username, hash)
 
             # The certificate exists, return the information
             if cert:
+                app.logger.info('User: %s, certificate found, ID: $s' % (username, cert.id))
                 r = jsend.success({'certificate_id': cert.id, 'cert_fqdn': cert.cert_fqdn})
                 return jsonify(r), 200
             else:
+                app.logger.info('User: %s, certificate NOT found.' % username)
                 r = jsend.fail({'message': 'certificate does not exist for principle {}'.format(username)})
                 return jsonify(r), 404
         else:
@@ -195,7 +197,7 @@ class ComodoTLSCertificateRenew(Resource):
 
             result = comodo.renew(certificate_id)
 
-            app.logger.info('Renewal: User: %s Result is: %s' % (username, result['status']))
+            app.logger.info('User: %s Result is: %s' % (username, result['status']))
 
             if result['status'] == 'success':
                 return jsonify(result), 201
