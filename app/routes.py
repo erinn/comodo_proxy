@@ -152,6 +152,7 @@ class ComodoTLSCertificateEnroll(Resource):
             r = jsend.fail({'message': 'unauthorized'})
             return jsonify(r), 403
 
+
 @api.route('/comodo/v1.0/tls/info/sha256/<string:hash>')
 @api.doc(params={'hash': "The certificate's SHA256 hash"})
 @api.response(404, 'Certificate not found')
@@ -180,6 +181,7 @@ class ComodoTLSCertificateInfo(Resource):
         else:
             r = jsend.fail({'message': 'unauthorized'})
             return jsonify(r), 403
+
 
 @api.route('/comodo/v1.0/tls/renew/<int:certificate_id>')
 @api.doc(params={'certificate_id': 'The Certificate ID'})
