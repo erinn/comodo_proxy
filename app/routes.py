@@ -23,17 +23,21 @@ def strip_principle(principle):
     :rtype: str
     """
 
+    app.logger.debug('Examining principle: %s' % principle)
     name, realm = principle.split('@')
 
     # This is already a NETBIOS name
     if name.isupper() and name.endswith('$'):
+        app.logger.debug('Principle: %s IS a NETBIOS principle.' % principle)
         return principle
 
     _, service_name = name.split('/')
 
     netbios_name = service_name.split('.')[0].upper() + '$' + '@' + realm
+    app.logger.debug('Netbios principle constructed for principle: %s is %s' % (netbios_name, principle))
 
     return netbios_name
+
 
 def user_authorized(username):
     canon_username = strip_principle(username)
