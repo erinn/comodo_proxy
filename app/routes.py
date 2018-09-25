@@ -8,12 +8,41 @@ from flask_restplus import Resource
 from app.cert import get_sha256_hash
 
 
+def strip_principle(principle):
+    """
+    This is a hack. To work around the fact that the DB only holds a string representation of the NETBIOS
+    principle. This function turns all principle representations into NETBIOS representations, for example:
+    a principle that looks like host/foo.example.com@EXAMPLE.COM will become FOO$@EXAMPLE.COM. If a NETBIOS
+    principle is passed in it will simply be returned. This function should handle the following types:
+    host/foo.example.com@EXAMPLE.COM -> FOO$@EXAMPLE.COM
+    host/foo@EXAMPLE.COM -> FOO$@EXAMPLE.COM
+    FOO$@EXAMPLE.COM -> FOO$@EXAMPLE.COM
+
+    :param str principle: The principle as a string
+    :return: The NETBIOS principle
+    :rtype: str
+    """
+
+    name, realm = principle.split('@')
+
+    # This is already a NETBIOS name
+    if name.isupper() and name.endswith('$'):
+        return principle
+
+    _, service_name = name.split('/')
+
+    netbios_name = service_name.split('.')[0].upper() + '$' + '@' + realm
+
+    return netbios_name
+
 def user_authorized(username):
-    if username in g.acl_list:
-        app.logger.info('User: %s is authorized!' % username)
+    canon_username = strip_principle(username)
+
+    if canon_username in g.acl_list:
+        app.logger.info('User: %s is authorized!' % canon_username)
         return True
     else:
-        app.logger.info('User: %s is denied!' % username)
+        app.logger.info('User: %s is denied!' % canon_username)
         return False
 
 
