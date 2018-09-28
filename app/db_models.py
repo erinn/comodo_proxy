@@ -21,4 +21,4 @@ class Certificate(db.Model):
     principle_id = db.Column(db.Integer, db.ForeignKey('principles.id'))
 
     def __repr__(self):
-        return '<Certificate:{}, SHA256:{}>'.format(self.cert_fqdn, self.cert_sha256)
+        return '<Certificate:{}, Certificate ID: {} SHA256:{}>'.format(self.cert_fqdn, self.id, self.cert_sha256)

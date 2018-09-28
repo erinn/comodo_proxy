@@ -83,9 +83,9 @@ class ComodoTLSCertificate(Resource):
                     hash = get_sha256_hash(pem)
 
                     # If the certificate isn't already in the DB we add it
-                    if not certificate_exists(username, hash):
+                    if not certificate_exists(strip_principle(username), hash):
 
-                        add_certificate(certificate_id, hash, pem, username)
+                        add_certificate(certificate_id, hash, pem, strip_principle(username))
 
                 return jsonify(result), 200
             else:
@@ -133,7 +133,6 @@ class ComodoTLSCertificateEnroll(Resource):
     @gssapi.require_auth()
     def post(self, username=''):
         """Submit a Certificate Signing Request (CSR) for a SSL/TLS certificate"""
-
         if user_authorized(username):
 
             app.logger.info('User: %s is submitting a CSR' % username)
@@ -200,11 +199,11 @@ class ComodoTLSCertificateInfo(Resource):
         if user_authorized(username):
             app.logger.info('User: %s, GET certificate information on hash: %s' % (username, hash))
 
-            cert = certificate_exists(username, hash)
+            cert = certificate_exists(strip_principle(username), hash)
 
             # The certificate exists, return the information
             if cert:
-                app.logger.info('User: %s, certificate found, ID: $s' % (username, cert.id))
+                app.logger.info('User: %s, certificate found, ID: %s' % (username, cert.id))
                 r = jsend.success({'certificate_id': cert.id, 'cert_fqdn': cert.cert_fqdn})
                 return jsonify(r), 200
             else:

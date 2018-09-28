@@ -153,5 +153,5 @@ It is expected that the developer will user a docker-compose.override.yaml file 
 environmental variables. 
 
 At this point the DB is not automatically populated when the containers come up. In the root of the source
-code directory you can set the DATABASE_URI environmental variable to point to the container and run 'flask db upgrade'
+code directory you can set the DATABASE_URL environmental variable to point to the container and run 'flask db upgrade'
 this will populate the DB.
