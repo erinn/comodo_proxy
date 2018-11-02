@@ -147,7 +147,7 @@ class ComodoTLSCertificateEnroll(Resource):
                                    subject_alt_names=body.get('subject_alt_names', ''),
                                    term=body['term'])
 
-            app.logger.info('User: %s Result is: %s' % (username, result['status']))
+            app.logger.info('User: %s Result is: %s, Message: %s', username, result['status'], result['message'])
 
             if result['status'] == 'success':
                 return jsonify(result), 201

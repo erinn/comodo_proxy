@@ -15,7 +15,7 @@ class Principles(db.Model):
 class Certificate(db.Model):
     __tablename__ = 'certificates'
 
-    id = db.Column(db.Integer, primary_key= True)
+    id = db.Column(db.Integer, primary_key=True)
     cert_fqdn = db.Column(db.String(300))
     cert_sha256 = db.Column(db.String(64))
     principle_id = db.Column(db.Integer, db.ForeignKey('principles.id'))

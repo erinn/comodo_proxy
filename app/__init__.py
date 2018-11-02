@@ -9,7 +9,7 @@ from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 app = Flask(__name__)
 
