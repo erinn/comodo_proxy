@@ -147,11 +147,11 @@ class ComodoTLSCertificateEnroll(Resource):
                                    subject_alt_names=body.get('subject_alt_names', ''),
                                    term=body['term'])
 
-            app.logger.info('User: %s Result is: %s, Message: %s', username, result['status'], result['message'])
-
             if result['status'] == 'success':
+                app.logger.info('User: %s Result is: %s, Data: %s', username, result['status'], result['data'])
                 return jsonify(result), 201
             else:
+                app.logger.info('User: %s Result is: %s, Message: %s', username, result['status'], result['message'])
                 return jsonify(result), 400
         else:
             r = jsend.fail({'message': 'unauthorized'})
