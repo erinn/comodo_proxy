@@ -8,45 +8,13 @@ from flask_restplus import Resource
 from app.cert import get_sha256_hash
 
 
-def strip_principle(principle):
-    """
-    This is a hack. To work around the fact that the DB only holds a string representation of the NETBIOS
-    principle. This function turns all principle representations into NETBIOS representations, for example:
-    a principle that looks like host/foo.example.com@EXAMPLE.COM will become FOO$@EXAMPLE.COM. If a NETBIOS
-    principle is passed in it will simply be returned. This function should handle the following types:
-    host/foo.example.com@EXAMPLE.COM -> FOO$@EXAMPLE.COM
-    host/foo@EXAMPLE.COM -> FOO$@EXAMPLE.COM
-    FOO$@EXAMPLE.COM -> FOO$@EXAMPLE.COM
-
-    :param str principle: The principle as a string
-    :return: The NETBIOS principle
-    :rtype: str
-    """
-
-    app.logger.debug('Examining principle: %s' % principle)
-    name, realm = principle.split('@')
-
-    # This is already a NETBIOS name
-    if name.isupper() and name.endswith('$'):
-        app.logger.debug('Principle: %s IS a NETBIOS principle.' % principle)
-        return principle
-
-    _, service_name = name.split('/')
-
-    netbios_name = service_name.split('.')[0].upper() + '$' + '@' + realm
-    app.logger.debug('Netbios principle constructed for principle: %s is %s' % (netbios_name, principle))
-
-    return netbios_name
-
-
 def user_authorized(username):
-    canon_username = strip_principle(username)
 
-    if canon_username in g.acl_list:
-        app.logger.info('User: %s is authorized!' % canon_username)
+    if username in g.acl_list:
+        app.logger.info('User: %s is authorized!' % username)
         return True
     else:
-        app.logger.info('User: %s is denied!' % canon_username)
+        app.logger.info('User: %s is denied!' % username)
         return False
 
 
@@ -83,9 +51,9 @@ class ComodoTLSCertificate(Resource):
                     hash = get_sha256_hash(pem)
 
                     # If the certificate isn't already in the DB we add it
-                    if not certificate_exists(strip_principle(username), hash):
+                    if not certificate_exists(username, hash):
 
-                        add_certificate(certificate_id, hash, pem, strip_principle(username))
+                        add_certificate(certificate_id, hash, pem, username)
 
                 return jsonify(result), 200
             else:
@@ -199,7 +167,7 @@ class ComodoTLSCertificateInfo(Resource):
         if user_authorized(username):
             app.logger.info('User: %s, GET certificate information on hash: %s' % (username, hash))
 
-            cert = certificate_exists(strip_principle(username), hash)
+            cert = certificate_exists(username, hash)
 
             # The certificate exists, return the information
             if cert:
