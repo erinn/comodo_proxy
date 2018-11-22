@@ -68,6 +68,7 @@ def populate_acl():
 
 # Establish logging when running under gunicorn. If running standalone will function as a normal
 # flask server.
+# TODO: fix this so it works for both flask dev server and gunicorn
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
