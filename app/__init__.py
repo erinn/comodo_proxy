@@ -68,10 +68,10 @@ def populate_acl():
 
 # Establish logging when running under gunicorn. If running standalone will function as a normal
 # flask server.
-# if __name__ != '__main__':
-#     gunicorn_logger = logging.getLogger('gunicorn.error')
-#     app.logger.handlers = gunicorn_logger.handlers
-#     app.logger.setLevel(gunicorn_logger.level)
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 app.logger.info('comodo_proxy %s starting.' % __version__)
 app.logger.debug('comodo_proxy config: %s' % app.config)
