@@ -39,7 +39,7 @@ class ComodoTLSCertificate(Resource):
 
             app.logger.info('User: %s request status: %s' % (username, result['status']))
 
-            if result['status'] == 'success':
+            if jsend.is_success(result):
 
                 # If the certificate is issued we insert it into the DB
                 if result['data']['certificate_status'] == 'issued':
@@ -53,7 +53,11 @@ class ComodoTLSCertificate(Resource):
                     # If the certificate isn't already in the DB we add it
                     if not certificate_exists(username, hash):
 
-                        add_certificate(certificate_id, hash, pem, username)
+                        r = add_certificate(certificate_id, hash, pem, username)
+
+                        # We have an error
+                        if r:
+                            return jsonify(r), 500
 
                 return jsonify(result), 200
             else:
@@ -83,7 +87,7 @@ class ComodoTLSCertificateRevoke(Resource):
             app.logger.info('User: %s revoking certificate ID: %s, result: %s' %
                             (username, certificate_id, result['status']))
 
-            if result['status'] == 'success':
+            if jsend.is_success(result):
                 return jsonify(result), 200
             else:
                 return jsonify(result), 400
@@ -115,9 +119,12 @@ class ComodoTLSCertificateEnroll(Resource):
                                    subject_alt_names=body.get('subject_alt_names', ''),
                                    term=body['term'])
 
-            if result['status'] == 'success':
+            if jsend.is_success(result):
                 app.logger.info('User: %s Result is: %s, Data: %s', username, result['status'], result['data'])
                 return jsonify(result), 201
+            elif jsend.is_fail(result):
+                app.logger.info('User: %s, Result is: %s, Data: %s', username, result['status'], result['data'])
+                return jsonify(result), 400
             else:
                 app.logger.info('User: %s Result is: %s, Message: %s', username, result['status'], result['message'])
                 return jsonify(result), 400
@@ -141,7 +148,7 @@ class ComodoTLSCertificateEnroll(Resource):
 
             app.logger.info('User: %s GET certificate information, result: %s.' % (username, result['status']))
 
-            if result['status'] == 'success':
+            if jsend.is_success(result):
                 r = jsend.success({'formats': formats, 'format_type': format_type,
                                    'cert_types': result['data']['types']})
                 return jsonify(r), 200
@@ -176,7 +183,7 @@ class ComodoTLSCertificateInfo(Resource):
                 return jsonify(r), 200
             else:
                 app.logger.info('User: %s, certificate NOT found.' % username)
-                r = jsend.fail({'message': 'certificate does not exist for principle {}'.format(username)})
+                r = jsend.fail({'message': 'Certificate does not exist for principle {}'.format(username)})
                 return jsonify(r), 404
         else:
             r = jsend.fail({'message': 'unauthorized'})
@@ -201,7 +208,7 @@ class ComodoTLSCertificateRenew(Resource):
 
             app.logger.info('User: %s Result is: %s' % (username, result['status']))
 
-            if result['status'] == 'success':
+            if jsend.is_success(result):
                 return jsonify(result), 201
             else:
                 return jsonify(result), 404

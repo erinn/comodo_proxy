@@ -1,19 +1,22 @@
 from app import app, db
 from app.cert import get_cn
 from app.db_models import Certificate, Principles
+from sqlalchemy.exc import IntegrityError
+
+import jsend
 
 
 def add_certificate(id, sha256_hash, pem, principle):
     """
     This function adds a certificate entry to the DB associated with a principle. This function returns
-    None on success or an exception will be raised on failure.
+    None on success or a jsend formatted dictionary with the error on failure.
 
     :param int id: The certificate ID, this must be unique
     :param string sha256_hash: The SHA256 hash as a string
     :param string pem: The base 64 PEM formatted representation of the certificate
     :param string principle: The principle name, example 'FOO@EXAMPLE.COM'
-    :return: None
-    :rtype None:
+    :return: Either None for no error, or a jsend formatted dictionary for an error.
+    :rtype string:
     """
 
     # Get the CN of the certificate
@@ -22,11 +25,16 @@ def add_certificate(id, sha256_hash, pem, principle):
     p = Principles.query.filter_by(principle=principle).first()
     cert = Certificate(id=id, cert_sha256=sha256_hash, cert_fqdn=cn, principle=p)
 
-    app.logger.debug('Adding cert: %s to DB with principle: %s' % (cert, principle))
+    app.logger.debug('Attempting to add certificate: %s to DB with principle: %s' % (cert, principle))
 
-    db.session.add(cert)
-    db.session.commit()
-
+    try:
+        db.session.add(cert)
+        db.session.commit()
+    except IntegrityError:
+        # TODO: Expand logger info.
+        app.logger.info('A DB Key collision occurred.')
+        return jsend.error('A DB key collision has occurred. If you are debugging the helper by hand, this is expected '
+                           'and indicates everything is working. Otherwise, figure out what went wrong on the server.')
     return None
 
 
