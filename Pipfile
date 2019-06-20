@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flask-shell-ipython = "*"
+
+[packages]
+comodo-rest-api = "*"
+cryptography = "*"
+blinker = "*"
+flask-restplus = "*"
+gunicorn = "*"
+mysql-connector = "*"
+pyjsend = "*"
+raven = "*"
+Flask = "*"
+Flask-GSSAPI = "*"
+Flask-Migrate = "*"
+SQLAlchemy = "*"
+
+[requires]
+python_version = "3.7"
