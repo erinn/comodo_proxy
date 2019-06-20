@@ -1,4 +1,4 @@
-comodo_proxy is a simle(ish) proxy between Comodo's REST API and a custom and minimal REST API. comodo_proxy
+comodo_proxy is a simle(ish) proxy between Sectigo's REST API and a custom and minimal REST API. comodo_proxy
 is designed to be deployed in a Kerberos/GSSAPI environment as access control is handled via principles, the code
 could be modified for simple auth easily. 
 
@@ -13,9 +13,9 @@ To build the image run the following for CentOS:
 
     s2i build https://github.com/erinn/comodo_proxy docker.io/centos/python-36-centos7 comodo_proxy:latest
 
-Or if you have paid for a RHEL system:
+Or if you wish to use the now free RHEL UBI containers:
 
-    s2i build https://github.com/erinn/comodo_proxy registry.access.redhat.com/rhscl/python-36-rhel7 comodo_proxy:latest
+    s2i build https://github.com/erinn/comodo_proxy registry.redhat.io/ubi8/python-36 comodo_proxy:latest
 
 This will provide you with a docker container tagged 'comodo_proxy' which you will then need to start with the
 appropriate mount points, see below.
@@ -154,4 +154,19 @@ environmental variables.
 
 At this point the DB is not automatically populated when the containers come up. In the root of the source
 code directory you can set the DATABASE_URL environmental variable to point to the container and run 'flask db upgrade'
-this will populate the DB.
+this will populate the DB. For example:
+
+        export DATABASE_URL=mysql+mysqlconnector://comodo_proxy:echee4yeloa0Iajienu9thahGhoo4x@localhost:8001/comodo_proxy
+        flask db upgrade
+
+# Creating a new release:
+1. Build the container using s2i as referenced above
+2. Tag the newly built container with a version number, not just latest:
+        
+        docker tag comodo_proxy:latest docker.io/cuboulder/comodo_proxy:5.5 
+        docker tag comodo_proxy:latest docker.io/cuboulder/comodo_proxy:latest
+
+3. Push the newly built container to docker hub (you must be logged in to docker hub):
+    
+        docker push docker.io/cuboulder/comodo_proxy:5.5
+        docker push docker.io/cuboulder/comodo_proxy:latest
