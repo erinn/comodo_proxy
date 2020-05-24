@@ -26,25 +26,24 @@ jobs:
       - name: s2i generate
         run: |
           /usr/local/bin/s2i generate registry.access.redhat.com/ubi8/python-36 Dockerfile
-      - name: list dir contents
-        run: |
-          ls /home/runner/work/
-          ls /home/runner/work/workflows/
-          ls /home/runner/work/workflows/workflows/
-          ls /home/runner/work/workflows/workflows/upload/src/
       - name: checkout the source to uploads
         uses: actions/checkout@v2
         with:
           path: upload/src/
+      - name: list dir contents
+        run: |
+          ls /home/runner/work/
+          ls /home/runner/work/comodo_proxy/
+          ls /home/runner/work/comodo_proxy/uploads/src/
       - name: upload artifact
         uses: actions/upload-artifact@v2-preview
         with:
           name: archive-with-dockerfile
-          path: ~/work/workflows/comodo_proxy/**
+          path: ~/work/comdo_proxy/**
       - name: docker build, tag and push
         uses: machine-learning-apps/gpr-docker-publish@master
         with:
           IMAGE_NAME: comodo_proxy-test
-          BUILD_CONTEXT: /home/runner/work/workflows/comodo_proxy/
+          BUILD_CONTEXT: /home/runner/work/comodo_proxy/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
