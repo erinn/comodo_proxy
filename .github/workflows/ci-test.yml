@@ -30,16 +30,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: upload/src/
-      - name: list dir contents
-        run: |
-          ls /home/runner/work/
-          ls /home/runner/work/comodo_proxy/
-          ls /home/runner/work/comodo_proxy/comodo_proxy/
       - name: upload artifact
         uses: actions/upload-artifact@v2-preview
         with:
           name: archive-with-dockerfile
-          path: ~/work/comdo_proxy/comodo_proxy/**
+          path: ~/work/comodo_proxy/comodo_proxy/**
       - name: docker build, tag and push
         uses: machine-learning-apps/gpr-docker-publish@master
         with:
