@@ -34,11 +34,11 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: archive-with-dockerfile
-          path: ~/work/workflows/workflows/**
+          path: ~/work/workflows/comodo_proxy/**
       - name: docker build, tag and push
         uses: machine-learning-apps/gpr-docker-publish@master
         with:
-          IMAGE_NAME: workflows-test
-          BUILD_CONTEXT: /home/runner/work/workflows/workflows/
+          IMAGE_NAME: comodo_proxy-test
+          BUILD_CONTEXT: /home/runner/work/workflows/comodo_proxy/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
