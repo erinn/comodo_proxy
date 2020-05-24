@@ -10,11 +10,11 @@ from app.cert import get_sha256_hash
 
 def user_authorized(username):
 
-    if username in g.acl_list:
-        app.logger.info('User: %s is authorized!' % username)
+    if username.upper() in g.acl_list:
+        app.logger.info('User: %s is authorized!', username)
         return True
     else:
-        app.logger.info('User: %s is denied!' % username)
+        app.logger.info('User: %s is denied!', username)
         return False
 
 

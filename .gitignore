@@ -109,3 +109,8 @@ venv.bak/
 /app.db
 env.sh
 /docker-compose.override.yaml
+# s2i generate files:
+Dockerfile
+upload/
+downloads/
+
