@@ -28,7 +28,8 @@ jobs:
           /usr/local/bin/s2i generate registry.access.redhat.com/ubi8/python-36 Dockerfile
       - name: list dir contents
         run: |
-          ls /home/runner/work/workflows/workflows/
+          ls /home/runner/work/
+          ls /home/runner/work/workflows/
           ls /home/runner/work/workflows/workflows/
           ls /home/runner/work/workflows/workflows/upload/src/
       - name: checkout the source to uploads
