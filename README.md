@@ -1,5 +1,5 @@
-![](https://github.com/erinn/comodo_proxy/workflows/.github/workflows/cd.yml/badge.svg)
-
+![](https://github.com/erinn/comodo_proxy/workflows/Deploy%20Container/badge.svg)
+    
 comodo_proxy is a simple(ish) proxy between Sectigo's REST API and a custom and minimal REST API. comodo_proxy
 is designed to be deployed in a Kerberos/GSSAPI environment as access control is handled via principles, the code
 could be modified for simple auth easily. 
