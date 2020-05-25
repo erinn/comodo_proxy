@@ -40,7 +40,7 @@ services:
      SENTRY_DSN: ''
 
   db:
-    image: "centos/mariadb-102-centos7"
+    image: "mariadb"
     environment:
       MYSQL_USER: 'comodo_proxy'
       MYSQL_PASSWORD: 'echee4yeloa0Iajienu9thahGhoo4x'

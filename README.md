@@ -1,24 +1,32 @@
-comodo_proxy is a simle(ish) proxy between Sectigo's REST API and a custom and minimal REST API. comodo_proxy
+![](https://github.com/erinn/comodo_proxy/workflows/.github/workflows/cd.yml/badge.svg)
+
+comodo_proxy is a simple(ish) proxy between Sectigo's REST API and a custom and minimal REST API. comodo_proxy
 is designed to be deployed in a Kerberos/GSSAPI environment as access control is handled via principles, the code
 could be modified for simple auth easily. 
 
-# Deploying:
+# Building a container for development use:
 This code is meant to be run inside of a docker container, and for maximum ease I would recommend using the 
 source-to-image tool: https://github.com/openshift/source-to-image
 
-Using s2i will dramatically speed up deployment of the application, if a container needs to be built by hand 
-for some reason, that exercise will be left up to the reader.
+You will need to have at least version >= 1.3.0 of s2i. 
 
-To build the image run the following for CentOS:
+To build the dockerfile run the following for CentOS:
 
-    s2i build https://github.com/erinn/comodo_proxy docker.io/centos/python-36-centos7 comodo_proxy:latest
+    s2i generate docker.io/centos/python-36-centos7 Dockerfile
 
-Or if you wish to use the now free RHEL UBI containers:
+Or if you wish to use the now free to all RHEL UBI containers:
 
-    s2i build https://github.com/erinn/comodo_proxy registry.redhat.io/ubi8/python-36 comodo_proxy:latest
+    s2i generate registry.access.redhat.com/ubi8/python-38 Dockerfile
 
-This will provide you with a docker container tagged 'comodo_proxy' which you will then need to start with the
-appropriate mount points, see below.
+This will provide you with a Dockerfile which you can then run through your preferred builder. Most folks will be most familiar with 'docker build':
+
+    docker build -t comodo_proxy:latest .
+
+However, buildah can also be used:
+
+    buildah build -f Dockerfile -t comodo_proxy:dev .
+    
+Finally push the container to the appropriate location using docker, buildah, or whatever tool suits you.
 
 ## Mounts:
 The container requires the following mounts in order to work (all files on the host must, obviously, 
@@ -61,7 +69,7 @@ There is a bug open about this here: https://bugzilla.redhat.com/show_bug.cgi?id
 
 Place the above into a docker_kerberos.te file, compile it into a module and then insert the module:
  - checkmodule -M -m -o docker_kerberos.mod docker_kerberos.te
- - semodule_package -o docker_kerberos.pp docker_kerberos.mod
+ - semodule_package -o docker_kerberos.pp -m docker_kerberos.mod
  - sudo semodule -i docker_kerberos.pp 
  
 ## Environmental Variables:
@@ -159,14 +167,5 @@ this will populate the DB. For example:
         export DATABASE_URL=mysql+mysqlconnector://comodo_proxy:echee4yeloa0Iajienu9thahGhoo4x@localhost:8001/comodo_proxy
         flask db upgrade
 
-# Creating a new release:
-1. Build the container using s2i as referenced above
-2. Tag the newly built container with a version number, not just latest:
-        
-        docker tag comodo_proxy:latest docker.io/cuboulder/comodo_proxy:5.5 
-        docker tag comodo_proxy:latest docker.io/cuboulder/comodo_proxy:latest
-
-3. Push the newly built container to docker hub (you must be logged in to docker hub):
-    
-        docker push docker.io/cuboulder/comodo_proxy:5.5
-        docker push docker.io/cuboulder/comodo_proxy:latest
+# Creating a new production release:
+Whenever a branch is merged into master and pushed github actions will create a new container that will be tagged with the short hash of the commit, as well as being tagged 'latest'. Simply put, unless something breaks, there is nothing for you to do to create a new release. 

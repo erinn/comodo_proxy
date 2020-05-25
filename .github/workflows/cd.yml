@@ -1,0 +1,49 @@
+name: Container Deploy
+
+on:
+  push:
+    branches: 
+      - master
+    paths:
+      - "**"
+  schedule:
+    - cron: '* * * * 0'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install s2i
+        run: |
+          mkdir /tmp/s2i/ && cd /tmp/s2i/
+          curl -s https://api.github.com/repos/openshift/source-to-image/releases/latest \
+          | grep browser_download_url \
+          | grep linux-amd64 \
+          | cut -d '"' -f 4 \
+          | wget -qi -
+          tar xvf source-to-image*.gz
+          sudo mv s2i /usr/local/bin
+          rm -rf /tmp/s2i/
+          cd
+      - name: checkout the source to homedir
+        uses: actions/checkout@v2
+      - name: s2i generate
+        run: |
+          /usr/local/bin/s2i generate registry.access.redhat.com/ubi8/python-36 Dockerfile
+      - name: checkout the source to uploads
+        uses: actions/checkout@v2
+        with:
+          path: upload/src/
+      - name: upload artifact
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: archive-with-dockerfile
+          path: ~/work/comodo_proxy/comodo_proxy/**
+      - name: docker build, tag and push
+        uses: machine-learning-apps/gpr-docker-publish@master
+        with:
+          IMAGE_NAME: comodo_proxy-test
+          BUILD_CONTEXT: /home/runner/work/comodo_proxy/comodo_proxy/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
