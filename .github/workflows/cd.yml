@@ -43,7 +43,7 @@ jobs:
       - name: docker build, tag and push
         uses: machine-learning-apps/gpr-docker-publish@master
         with:
-          IMAGE_NAME: comodo_proxy-test
+          IMAGE_NAME: comodo_proxy
           BUILD_CONTEXT: /home/runner/work/comodo_proxy/comodo_proxy/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
