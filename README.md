@@ -1,8 +1,10 @@
+![](https://github.com/erinn/comodo_proxy/workflows/.github/workflows/cd.yml/badge.svg)
+
 comodo_proxy is a simple(ish) proxy between Sectigo's REST API and a custom and minimal REST API. comodo_proxy
 is designed to be deployed in a Kerberos/GSSAPI environment as access control is handled via principles, the code
 could be modified for simple auth easily. 
 
-# Deploying:
+# Building a container for development use:
 This code is meant to be run inside of a docker container, and for maximum ease I would recommend using the 
 source-to-image tool: https://github.com/openshift/source-to-image
 
@@ -14,7 +16,7 @@ To build the dockerfile run the following for CentOS:
 
 Or if you wish to use the now free to all RHEL UBI containers:
 
-    s2i generate registry.access.redhat.com/ubi8/python-36 Dockerfile
+    s2i generate registry.access.redhat.com/ubi8/python-38 Dockerfile
 
 This will provide you with a Dockerfile which you can then run through your preferred builder. Most folks will be most familiar with 'docker build':
 
@@ -22,7 +24,7 @@ This will provide you with a Dockerfile which you can then run through your pref
 
 However, buildah can also be used:
 
-    buildah build -f Dockerfile -t comodo_proxy:latest .
+    buildah build -f Dockerfile -t comodo_proxy:dev .
     
 Finally push the container to the appropriate location using docker, buildah, or whatever tool suits you.
 
@@ -165,14 +167,5 @@ this will populate the DB. For example:
         export DATABASE_URL=mysql+mysqlconnector://comodo_proxy:echee4yeloa0Iajienu9thahGhoo4x@localhost:8001/comodo_proxy
         flask db upgrade
 
-# Creating a new release:
-1. Build the container using s2i as referenced above
-2. Tag the newly built container with a version number, not just latest:
-        
-        docker tag comodo_proxy:latest docker.io/cuboulder/comodo_proxy:5.5 
-        docker tag comodo_proxy:latest docker.io/cuboulder/comodo_proxy:latest
-
-3. Push the newly built container to docker hub (you must be logged in to docker hub):
-    
-        docker push docker.io/cuboulder/comodo_proxy:5.5
-        docker push docker.io/cuboulder/comodo_proxy:latest
+# Creating a new production release:
+Whenever a branch is merged into master and pushed github actions will create a new container that will be tagged with the short hash of the commit, as well as being tagged 'latest'. Simply put, unless something breaks, there is nothing for you to do to create a new release. 

@@ -1,9 +1,14 @@
-name: Node CD
+name: Container Deploy
 
 on:
   push:
+    branches: 
+      - master
     paths:
       - "**"
+  schedule:
+    - cron: '* * * * 0'
+
 
 jobs:
   build:
@@ -40,6 +45,5 @@ jobs:
         with:
           IMAGE_NAME: comodo_proxy-test
           BUILD_CONTEXT: /home/runner/work/comodo_proxy/comodo_proxy/
-          BRANCH_TAG: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

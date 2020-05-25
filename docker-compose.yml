@@ -1,0 +1,50 @@
+version: '3'
+services:
+  web:
+    image: "comodo_proxy:dev"
+    ports:
+    - "8080:8080"
+    volumes:
+      - /etc/krb5.keytab:/etc/krb5.keytab:ro
+      - /etc/krb5.conf:/etc/krb5.conf:ro
+      - /etc/pki/tls/certs/comodo_client.crt:/etc/pki/tls/certs/comodo_client.crt:ro
+      - /etc/pki/tls/private/comodo_client.key:/etc/pki/tls/private/comodo_client.key:ro
+    environment:
+     #Set gunicorn logging to debug
+     GUNICORN_CMD_ARGS: "--log-level=debug"
+     # To get better error messages out of kerberos/gssapi enable KRB5_TRACE
+     KRB5_TRACE: /dev/stdout
+     # When used behind a proxy, gunicorn will not trust the headers sent by the proxy
+     # unless the following is set, this is dangerous if there is any chance the container
+     # will be able to accept connections from anywhere but the proxy, it can be set to
+     # specific IPs for more safety, see here: http://docs.gunicorn.org/en/latest/settings.html#forwarded-allow-ips
+     FORWARDED_ALLOW_IPS: '*'
+     DATABASE_URL: 'mysql+mysqlconnector://comodo_proxy:echee4yeloa0Iajienu9thahGhoo4x@db/comodo_proxy'
+     # The following are stub entries, the user should use a docker-compose.override.yaml file to fill in
+     # entries for the following environment variables. For explanations of the variables check the README
+     COMODO_API_URL: 'https://hard.cert-manager.com/api/ssl/v1/'
+     COMODO_CERT_TYPE_NAME: 'Comodo Unified Communications Certificate'
+     COMODO_CLIENT_CERT_AUTH: 'False'
+     COMODO_CLIENT_PUBLIC_CERT: '/etc/pki/tls/certs/comodo_client.crt'
+     COMODO_CLIENT_PRIVATE_KEY: '/etc/pki/tls/private/comodo_client.key'
+     COMODO_CUSTOMER_LOGIN_URI: 'example-corp'
+     COMODO_LOGIN: 'example-login'
+     COMODO_ORG_ID: '12345'
+     # The dollar sign '$' if used in a password needs to be doubled '$$' in order for docker-compose to
+     # not try to substitute a value: https://docs.docker.com/compose/compose-file/#variable-substitution
+     COMODO_PASSWORD: 'example-password'
+     GSSAPI_HOSTNAME: 'example.com'
+     GSSAPI_SERVICE_NAME: 'HTTP'
+     # This is a secret key for flask, nothing to do with Comodo
+     SECRET_KEY: 'Random secret key'
+     SENTRY_DSN: ''
+
+  db:
+    image: "mariadb"
+    environment:
+      MYSQL_USER: 'comodo_proxy'
+      MYSQL_PASSWORD: 'echee4yeloa0Iajienu9thahGhoo4x'
+      MYSQL_DATABASE: 'comodo_proxy'
+      MYSQL_ROOT_PASSWORD: 'ohy0oocah3seel7rei0UotiechoBoh'
+    ports:
+    - "8001:3306"
